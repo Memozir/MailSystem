@@ -1,5 +1,9 @@
 package db
 
+import (
+	"context"
+)
+
 type Storage interface {
-	createTables() error
+	CreateTables(context.Context) error
 }

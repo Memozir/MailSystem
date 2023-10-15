@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"url_shorter/db"
 	"url_shorter/server"
@@ -18,6 +19,9 @@ func main() {
 	if err != nil {
 		log.Default()
 	}
+	ctx := context.Background()
+
+	db.CreateTables(ctx)
 
 	server, err := server.NewServer("localhost", "8080", db)
 
