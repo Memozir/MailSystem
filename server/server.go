@@ -4,26 +4,29 @@ import (
 	"fmt"
 	"net/http"
 
+	"url_shorter/db"
 	"url_shorter/handlers"
 )
 
 type Server struct {
-	host string
-	port string
+	host    string
+	port    string
+	storage db.Storage
 }
 
-func NewServer(host string, port string) (server *Server) {
+func NewServer(host string, port string, storage db.Storage) (server *Server, err error) {
 	// TODO: Add error returning
-	// if len(host) == 0 {
-	// 	return nil, "Given port is empty"
-	// }
+	if len(host) == 0 {
+		return nil, err
+	}
 
-	// if len(port) == 0 {
-	// 	return nil, "Given port is empty"
-	// }
-	server = &Server{host, port}
+	if len(port) == 0 {
+		return nil, err
+	}
 
-	return server
+	server = &Server{host, port, storage}
+
+	return server, err
 }
 
 func (server *Server) Start() {
