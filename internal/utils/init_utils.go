@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 
-	"url_shorter/handlers"
+	"url_shorter/internal/handlers"
 )
 
 func LoadEnv() {
