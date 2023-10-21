@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"log"
-	"url_shorter/db"
-	"url_shorter/server"
-	utils "url_shorter/utils"
+	"url_shorter/internal/db"
+	"url_shorter/internal/server"
+	utils "url_shorter/internal/utils"
 )
 
 func init() {
