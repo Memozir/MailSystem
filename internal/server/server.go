@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"url_shorter/internal/db"
-	"url_shorter/internal/handlers"
+	"mail_system/internal/db"
+	"mail_system/internal/handlers"
 )
 
 type Server struct {

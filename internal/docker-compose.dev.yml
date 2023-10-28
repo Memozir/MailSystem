@@ -4,7 +4,7 @@ services:
     container_name: db
     image: postgres:15.4-alpine3.18
     environment:
-      POSTGRES_DB: "url_shorter_db"
+      POSTGRES_DB: "mail_system_db"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       PGDATA: "/var/lib/postgresql/data/pgdata"

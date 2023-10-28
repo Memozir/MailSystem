@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"log"
-	"url_shorter/internal/db"
-	"url_shorter/internal/server"
-	utils "url_shorter/internal/utils"
+	"mail_system/internal/db"
+	"mail_system/internal/server"
+	utils "mail_system/internal/utils"
 )
 
 func init() {
@@ -14,14 +14,10 @@ func init() {
 }
 
 func main() {
-	db, err := db.NewPostgresDb()
+	context := context.Background()
+	db, err := db.NewDb(context)
 
-	if err != nil {
-		log.Default()
-	}
-	ctx := context.Background()
-
-	db.CreateTables(ctx)
+	// db.CreateTables(ctx)
 
 	server, err := server.NewServer("localhost", "8080", db)
 
