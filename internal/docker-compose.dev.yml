@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   db:
+    container_name: db
     image: postgres:15.4-alpine3.18
     environment:
       POSTGRES_DB: "url_shorter_db"
