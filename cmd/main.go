@@ -15,9 +15,7 @@ func init() {
 
 func main() {
 	context := context.Background()
-	db, err := db.NewDb(context)
-
-	// db.CreateTables(ctx)
+	db := db.NewDb(context)
 
 	server, err := server.NewServer("localhost", "8080", db)
 

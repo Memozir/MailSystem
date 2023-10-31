@@ -11,15 +11,14 @@ import (
 	pgx "github.com/jackc/pgx/v5/pgxpool"
 )
 
-// "context"
-
 type PostgresDB struct {
 	connPool *pgx.Pool
 	cfg      *config.ConfigDb
 }
 
-func NewDb(ctx context.Context) (db *PostgresDB, err error) {
+func NewDb(ctx context.Context) (db *PostgresDB) {
 	db = new(PostgresDB)
+	var err error
 
 	db.cfg = &config.ConfigDb{
 		Host:         os.Getenv("DB_HOST"),
@@ -46,10 +45,11 @@ func NewDb(ctx context.Context) (db *PostgresDB, err error) {
 
 	if err != nil {
 		log.Fatalf("Failed connection to Postgres: %s", err)
-		return db, err
+		return db
 	}
 
-	return db, err
+	log.Printf("Connection to database on %s was Success", db.cfg.Host)
+	return db
 }
 
 // func (db *PostgresDB) CreateTables(ctx context.Context) (err error) {

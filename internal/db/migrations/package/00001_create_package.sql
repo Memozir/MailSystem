@@ -2,16 +2,13 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS Packages(
     id SERIAL PRIMARY KEY,
-    [status] INTEGER,
-    [weight] INTEGER NOT NULL,
+    "status" INTEGER REFERENCES Statuses(id),
+    "weight" INTEGER NOT NULL,
     price INTEGER NOT NULL,
-    sender INTEGER,
-    consumer INTEGER,
+    sender BIGINT REFERENCES Users(id),
+    consumer BIGINT REFERENCES Users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    delivering_at TIMESTAMP NOT NULL,
-    FOREIGN KEY ([status]) REFERENCES Statuses(id)
-    FOREIGN KEY (sender) REFERENCES User(id),
-    FOREIGN KEY (consumer) REFERENCES Users(id)
+    delivering_at TIMESTAMP NOT NULL
 );
 -- +goose StatementEnd
 

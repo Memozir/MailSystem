@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Users(
     pass VARCHAR(20) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     second_name VARCHAR(50) NOT NULL,
-    birth_date DATE,
+    birth_date DATE
 );
 -- +goose StatementEnd
 

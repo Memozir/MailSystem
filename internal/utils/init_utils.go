@@ -14,7 +14,6 @@ func LoadEnv() {
 }
 
 func LoadHandlers() *mux.Router {
-	// mux := http.NewServeMux()
 	mux := mux.NewRouter()
 
 	// Adding handlers
