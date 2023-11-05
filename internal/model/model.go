@@ -1,4 +1,4 @@
-package modal
+package model
 
 type User struct {
 	// id SERIAL PRIMARY KEY,
@@ -13,5 +13,9 @@ type User struct {
 	Pass       string `db:"pass"`
 	FirstName  string `db:"first_name"`
 	SecondName string `db:"second_name"`
-	// BirthDate time.
+	BirthDate  string `db:"birth_date"`
 }
+
+// func (user *User) Registrate() {
+// 	db.re
+// }

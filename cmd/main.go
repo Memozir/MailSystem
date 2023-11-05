@@ -16,8 +16,6 @@ func main() {
 	context := context.Background()
 	db := db.NewDb(context)
 
-	db.CreateUser("Yura", "Regan", "89100946599", "qwerty", "2002-02-15")
-
 	serverHost := os.Getenv("SERVER_HOST")
 	serverPort := os.Getenv("SERVER_PORT")
 	server, err := server.NewServer(serverHost, serverPort, db)
@@ -26,6 +24,7 @@ func main() {
 		log.Fatal("Server have not strted")
 	}
 
-	mux := handlers.LoadHandlers()
+	mailHandler := handlers.NewMailHandler(db)
+	mux := mailHandler.LoadHandlers()
 	server.Start(mux)
 }

@@ -57,8 +57,7 @@ func (db *PostgresDB) CreateUser(
 	second_name string,
 	phone string,
 	pass string,
-	birth string,
-) {
+	birth string) {
 	ctx := context.TODO()
 	pgcon, err := db.connPool.Exec(ctx, `
 		INSERT INTO Users(phone, pass, first_name, second_name, birth_date)
@@ -69,4 +68,18 @@ func (db *PostgresDB) CreateUser(
 		log.Printf("Falied create user: %s", err.Error())
 	}
 	log.Printf("PGCON: %s", pgcon)
+}
+
+func (db *PostgresDB) GetUserById(id int64) {
+	ctx := context.TODO()
+	res, err := db.connPool.Query(ctx, `
+		SELECT first_name, last_name, phone, pass, birth_date
+		FROM Users
+		WHERE id=$1
+	`, id)
+
+	if err != nil {
+		log.Println("Get user by id error")
+	}
+
 }
