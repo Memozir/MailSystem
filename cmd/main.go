@@ -4,8 +4,10 @@ import (
 	"context"
 	"log"
 	"mail_system/internal/db"
+	"mail_system/internal/handlers"
 	"mail_system/internal/server"
 	utils "mail_system/internal/utils"
+	"os"
 )
 
 func main() {
@@ -14,14 +16,16 @@ func main() {
 	context := context.Background()
 	db := db.NewDb(context)
 
-	utils.LoadHandlers()
+	db.CreateUser("Yura", "Regan", "89100946599", "qwerty", "2002-02-15")
 
-	server, err := server.NewServer("localhost", "8080", db)
+	serverHost := os.Getenv("SERVER_HOST")
+	serverPort := os.Getenv("SERVER_PORT")
+	server, err := server.NewServer(serverHost, serverPort, db)
 
 	if err != nil {
 		log.Fatal("Server have not strted")
 	}
 
-	log.Print("Server Successfuly Started")
-	server.Start()
+	mux := handlers.LoadHandlers()
+	server.Start(mux)
 }

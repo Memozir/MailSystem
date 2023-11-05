@@ -2,10 +2,12 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"mail_system/internal/db"
-	"mail_system/internal/handlers"
 )
 
 type Server struct {
@@ -29,9 +31,8 @@ func NewServer(host string, port string, storage db.Storage) (server *Server, er
 	return server, err
 }
 
-func (server *Server) Start() {
-	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(handlers.IndexHandler))
+func (server *Server) Start(mux *mux.Router) {
 	path := fmt.Sprintf("%s:%s", server.host, server.port)
-	http.ListenAndServe(path, mux)
+	log.Printf("Server is starting  on %s...", path)
+	log.Fatal(http.ListenAndServe(path, mux))
 }

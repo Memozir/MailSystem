@@ -52,11 +52,21 @@ func NewDb(ctx context.Context) (db *PostgresDB) {
 	return db
 }
 
-// func (db *PostgresDB) CreateTables(ctx context.Context) (err error) {
-// 	context, close := context.WithTimeout(ctx, 3*time.Second)
-// 	defer close()
+func (db *PostgresDB) CreateUser(
+	first_name string,
+	second_name string,
+	phone string,
+	pass string,
+	birth string,
+) {
+	ctx := context.TODO()
+	pgcon, err := db.connPool.Exec(ctx, `
+		INSERT INTO Users(phone, pass, first_name, second_name, birth_date)
+		VALUES($1, $2, $3, $4, $5)
+		`, phone, pass, first_name, second_name, birth)
 
-// 	db.connPool.Exec(context, )
-
-// 	return err
-// }
+	if err != nil {
+		log.Printf("Falied create user: %s", err.Error())
+	}
+	log.Printf("PGCON: %s", pgcon)
+}

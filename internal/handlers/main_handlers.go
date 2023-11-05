@@ -1,27 +1,21 @@
 package handlers
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-)
+// type ShortUrlAnswer struct {
+// 	Url string `json:"url"`
+// }
 
-type ShortUrlAnswer struct {
-	Url string `json:"url"`
-}
+// func IndexHandler(rw http.ResponseWriter, req *http.Request) {
+// 	id := req.URL.Query().Get("id")
+// 	fmt.Println(id)
 
-func IndexHandler(rw http.ResponseWriter, req *http.Request) {
-	id := req.URL.Query().Get("id")
-	fmt.Println(id)
+// 	rw.Header().Set("Content-Type", "application/json")
 
-	rw.Header().Set("Content-Type", "application/json")
+// 	link := "new link"
+// 	err := json.NewEncoder(rw).Encode(&ShortUrlAnswer{link})
 
-	link := "new link"
-	err := json.NewEncoder(rw).Encode(&ShortUrlAnswer{link})
+// 	if err != nil {
+// 		fmt.Println("error")
+// 	}
 
-	if err != nil {
-		fmt.Println("error")
-	}
-
-	rw.WriteHeader(http.StatusNotFound)
-}
+// 	rw.WriteHeader(http.StatusNotFound)
+// }
