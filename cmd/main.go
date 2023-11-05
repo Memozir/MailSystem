@@ -8,14 +8,13 @@ import (
 	utils "mail_system/internal/utils"
 )
 
-func init() {
-	utils.LoadEnv()
-	utils.LoadHandlers()
-}
-
 func main() {
+	utils.LoadEnv()
+
 	context := context.Background()
 	db := db.NewDb(context)
+
+	utils.LoadHandlers()
 
 	server, err := server.NewServer("localhost", "8080", db)
 
