@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -24,6 +25,7 @@ func (mh *mailHandler) LoadHandlers() *mux.Router {
 
 	// Adding handlers
 	mux.HandleFunc("/registration", mh.RegistrateUserHandler).Methods("POST")
+	mux.HandleFunc("/user/{id}", mh.GetUserHandler).Methods("GET")
 
 	return mux
 }
@@ -56,4 +58,10 @@ func (handler *mailHandler) RegistrateUserHandler(rw http.ResponseWriter, r *htt
 		userJSON.BirthDate)
 	rw.Header().Set("Content-type", "application/json")
 
+}
+
+func (handler *mailHandler) GetUserHandler(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	user := handler.db.GetUserById(vars["id"])
+	fmt.Println(user)
 }

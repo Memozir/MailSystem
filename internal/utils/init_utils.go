@@ -1,9 +1,13 @@
 package utils
 
 import (
+	"log"
+
 	"github.com/joho/godotenv"
 )
 
 func LoadEnv() {
-	godotenv.Load()
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatalf("Environment variables were not initialized: %s", err)
+	}
 }

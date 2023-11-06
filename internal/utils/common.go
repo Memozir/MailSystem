@@ -4,9 +4,9 @@ import (
 	"os"
 )
 
-func getEnvOrDefault(key string, def string) string {
+func GetEnvOrDefault(key string, def string) string {
 	value, exists := os.LookupEnv(key)
-	if exists {
+	if exists || value != "" {
 		return value
 	}
 	return def

@@ -1,5 +1,7 @@
 package db
 
+import "mail_system/internal/model"
+
 type Storage interface {
 	CreateUser(
 		first_name string,
@@ -7,4 +9,6 @@ type Storage interface {
 		phone string,
 		pass string,
 		birth string)
+	GetUserById(id string) *model.User
+	Reset()
 }
