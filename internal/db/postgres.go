@@ -93,7 +93,7 @@ func (db *PostgresDB) GetUserById(id string) *model.User {
 	}
 
 	res, err := db.connPool.Query(ctx, `
-		SELECT id, phone, pass, first_name, second_name, birth_date
+		SELECT id, phone, pass, first_name, second_name, birth_date::text
 		FROM Users
 		WHERE id=$1
 	`, idInt)

@@ -17,7 +17,7 @@ type User struct {
 	Pass       string `db:"pass"`
 	FirstName  string `db:"first_name"`
 	SecondName string `db:"second_name"`
-	BirthDate  []byte `db:"birth_date"`
+	BirthDate  string `db:"birth_date"`
 }
 
 func (user *User) String() string {
