@@ -6,9 +6,10 @@ import (
 	"log"
 	"os"
 
-	"mail_system/internal/config"
-
 	pgx "github.com/jackc/pgx/v5/pgxpool"
+
+	"mail_system/internal/config"
+	"mail_system/internal/model"
 )
 
 type PostgresDB struct {
@@ -70,16 +71,16 @@ func (db *PostgresDB) CreateUser(
 	log.Printf("PGCON: %s", pgcon)
 }
 
-func (db *PostgresDB) GetUserById(id int64) {
+func (db *PostgresDB) GetUserById(id int64) *model.User {
 	ctx := context.TODO()
-	res, err := db.connPool.Query(ctx, `
+	res := db.connPool.QueryRow(ctx, `
 		SELECT first_name, last_name, phone, pass, birth_date
 		FROM Users
 		WHERE id=$1
 	`, id)
 
-	if err != nil {
-		log.Println("Get user by id error")
-	}
+	user := &model.User{}
+	res.Scan(user)
 
+	return user
 }
