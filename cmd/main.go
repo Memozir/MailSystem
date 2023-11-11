@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"mail_system/internal/db"
+	postgres "mail_system/internal/db/postgres"
 	"mail_system/internal/handlers"
 	"mail_system/internal/server"
 	"mail_system/internal/utils"
@@ -30,7 +31,7 @@ func main() {
 	utils.LoadEnv()
 
 	context := context.Background()
-	db := db.NewDb(context)
+	db := postgres.NewDb(context)
 
 	serverHost := os.Getenv("SERVER_HOST")
 	serverPort := os.Getenv("SERVER_PORT")
@@ -40,8 +41,10 @@ func main() {
 		log.Fatal("Server have not started")
 	}
 
-	mailHandler := handlers.NewMailHandler(db)
-	mux := mailHandler.LoadHandlers()
+	handlers := handlers.MailHandlers{
+		User: postgres.User{Db: db},
+	}
+	mux := handlers.LoadHandlers()
 
 	exit := make(chan os.Signal, 1)
 	go graceFullShutdown(exit, db)
