@@ -1,7 +1,7 @@
 package handlers
 
-// type ShortUrlAnswer struct {
-// 	Url string `json:"url"`
+// type Handlers struct {
+// 	MailHandlers *MailHandlers
 // }
 
 // func IndexHandler(rw http.ResponseWriter, req *http.Request) {
