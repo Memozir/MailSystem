@@ -1,22 +1,19 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-
-	"mail_system/internal/db"
 )
 
-type Server struct {
-	host    string
-	port    string
-	storage db.Storage
+type MailSystemServer struct {
+	httpServer *http.Server
 }
 
-func NewServer(host string, port string, storage db.Storage) (server *Server, err error) {
+func NewServer(host string, port string, router *mux.Router) (server *MailSystemServer, err error) {
 	// TODO: Add error returning
 	if len(host) == 0 {
 		return nil, err
@@ -26,13 +23,20 @@ func NewServer(host string, port string, storage db.Storage) (server *Server, er
 		return nil, err
 	}
 
-	server = &Server{host, port, storage}
+	path := fmt.Sprintf("%s:%s", host, port)
+	server = &MailSystemServer{
+		httpServer: &http.Server{Addr: path, Handler: router},
+	}
 
 	return server, err
 }
 
-func (server *Server) Start(mux *mux.Router) {
-	path := fmt.Sprintf("%s:%s", server.host, server.port)
-	log.Printf("Server is starting  on %s...", path)
-	log.Fatal(http.ListenAndServe(path, mux))
+func (server *MailSystemServer) Start() {
+	log.Printf("Server is starting  on %s...", server.httpServer.Addr)
+	log.Fatal(server.httpServer.ListenAndServe())
+}
+
+func (server *MailSystemServer) Shutdown(ctx context.Context) {
+	log.Printf("Server shutdown")
+	server.httpServer.Shutdown(ctx)
 }
