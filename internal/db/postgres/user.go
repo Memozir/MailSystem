@@ -3,24 +3,23 @@ package db
 import (
 	"context"
 	"log"
-	"mail_system/internal/model"
 	"strconv"
 
 	"github.com/jackc/pgx/v5"
+
+	"mail_system/internal/model"
 )
 
-type User struct {
-	Db *PostgresDB
-}
-
-func (user *User) CreateUser(
+func (db *PostgresDB) CreateUser(
 	first_name string,
 	second_name string,
 	phone string,
 	pass string,
 	birth string) {
 	ctx := context.TODO()
-	pgcon, err := user.Db.connPool.Exec(ctx, `
+	// var u User
+	db.connPool.QueryRow(ctx, "SELECT * FROM user;").Scan()
+	pgcon, err := db.connPool.Exec(ctx, `
 		INSERT INTO Users(phone, pass, first_name, second_name, birth_date)
 		VALUES($1, $2, $3, $4, $5)
 		`, phone, pass, first_name, second_name, birth)
@@ -31,7 +30,7 @@ func (user *User) CreateUser(
 	log.Printf("PGCON: %s", pgcon)
 }
 
-func (user *User) GetUserById(id string) *model.User {
+func (db *PostgresDB) GetUserById(id string) *model.User {
 	ctx := context.TODO()
 	idInt, err := strconv.ParseInt(id, 10, 64)
 
@@ -39,7 +38,7 @@ func (user *User) GetUserById(id string) *model.User {
 		log.Println(err)
 	}
 
-	res, err := user.Db.connPool.Query(ctx, `
+	res, err := db.connPool.Query(ctx, `
 		SELECT id, phone, pass, first_name, second_name, birth_date::text
 		FROM Users
 		WHERE id=$1

@@ -29,7 +29,7 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 	}
 
 	log.Println(userJSON)
-	handler.User.CreateUser(
+	handler.Db.CreateUser(
 		userJSON.FirstName,
 		userJSON.SecondName,
 		userJSON.Phone,
@@ -41,7 +41,7 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 
 func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	user := handler.User.GetUserById(vars["id"])
+	user := handler.Db.GetUserById(vars["id"])
 	fmt.Println(user)
 }
 

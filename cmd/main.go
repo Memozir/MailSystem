@@ -34,9 +34,7 @@ func main() {
 	context := context.Background()
 	db := postgres.NewDb(context)
 
-	handlers := handlers.MailHandlers{
-		User: postgres.User{Db: db},
-	}
+	handlers := handlers.NewMailHandler(db)
 	mux := handlers.LoadHandlers()
 
 	serverHost := os.Getenv("SERVER_HOST")
