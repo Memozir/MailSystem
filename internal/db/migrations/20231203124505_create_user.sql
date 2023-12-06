@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS "user"(
     id bigserial primary key,
     phone varchar(12) unique,
     pass varchar(20) not null,
@@ -12,5 +12,5 @@ CREATE TABLE IF NOT EXISTS user (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS 'role';
+DROP TABLE IF EXISTS "user";
 -- +goose StatementEnd

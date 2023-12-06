@@ -5,19 +5,12 @@ import (
 )
 
 type User struct {
-	// id SERIAL PRIMARY KEY,
-	// phone VARCHAR(11) NOT NULL,
-	// pass VARCHAR(20) NOT NULL,
-	// first_name VARCHAR(50) NOT NULL,
-	// second_name VARCHAR(50) NOT NULL,
-	// birth_date DATE
-
-	Id         uint64 `db:"id"`
-	Phone      string `db:"phone"`
-	Pass       string `db:"pass"`
-	FirstName  string `db:"first_name"`
-	SecondName string `db:"second_name"`
-	BirthDate  string `db:"birth_date"`
+	Id        uint64 `db:"id"`
+	Phone     string `db:"phone"`
+	Pass      string `db:"pass"`
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	BirthDate string `db:"birth_date"`
 }
 
 func (user *User) String() string {
@@ -27,6 +20,6 @@ func (user *User) String() string {
 		user.Phone,
 		user.Pass,
 		user.FirstName,
-		user.SecondName,
+		user.LastName,
 		user.BirthDate)
 }

@@ -1,10 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXITS delivery_schedule(
+CREATE TABLE IF NOT EXISTS delivery_schedule(
     id bigserial primary key,
-    courier references employee(id) unique,
+    courier bigint unique, 
     export_date date,
-    import_date date 
+    import_date date,
+    foreign key (courier) references employee
 );
 -- +goose StatementEnd
 

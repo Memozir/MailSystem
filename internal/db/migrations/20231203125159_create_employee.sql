@@ -2,8 +2,11 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS employee(
     id bigserial primary key,
-    user references user(id) unique,
-    'role' references 'role'(code) unique
+    "user" bigint unique,
+    "role" bigint unique,
+    foreign key ("user") references "user",
+    foreign key ("role") references "role",
+    unique("user", "role")
 );
 -- +goose StatementEnd
 
