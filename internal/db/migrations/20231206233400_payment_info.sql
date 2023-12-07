@@ -2,8 +2,10 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS payment_info(
     id serial primary key,
-    package references package(id),
-    tarrif references tarrif(id)
+    package bigint not null unique,
+    tarrif bigint not null,
+    foreign key (package) references package,
+    foregin key (tarrif) references tarrif
 );
 -- +goose StatementEnd
 

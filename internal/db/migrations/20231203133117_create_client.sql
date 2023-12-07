@@ -2,8 +2,10 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS client(
     id bigserial primary key,
-    "user" references "user"(id) not null,
-    "address" references "address"(id),
+    "user" bigint not null,
+    "address" bigint,
+    foreign key ("user") references "user",
+    foreign key ("address") references "address"
 );
 -- +goose StatementEnd
 

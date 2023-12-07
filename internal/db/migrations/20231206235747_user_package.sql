@@ -1,8 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS user_package(
-    "user" references "user"(id),
-    package references package(id),
+    "user" bigint not null,
+    package bigint not null,
+    foreign key ("user") references "user",
+    foreign key (package) references package
 );
 -- +goose StatementEnd
 

@@ -3,7 +3,8 @@
 CREATE TABLE IF NOT EXISTS "address"(
     id bigserial primary key,
     "name" varchar(100) unique not null,
-    department references department(id)
+    department bigint,
+    foreign key (department) references department
 );
 -- +goose StatementEnd
 
