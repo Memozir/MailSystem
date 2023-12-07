@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS package(
     sender bigint,
     receiver bigint,
     courier bigint,
-    department_receiver bigint.
+    department_receiver bigint,
     "type" smallint not null,
     create_date date,
     deliver_date date,
