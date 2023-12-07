@@ -1,14 +1,14 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS tarrif(
-    id primary key,
+CREATE TABLE IF NOT EXISTS tarrif (
+    id bigserial primary key,
     price bigint,
     "weight" bigint,
-    "type" smallint,
+    "type" smallint
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE tarrif IF EXISTS;
+DROP TABLE IF EXISTS tarrif;
 -- +goose StatementEnd

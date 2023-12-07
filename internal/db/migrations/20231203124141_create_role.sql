@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS "role"(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE "role" IF EXISTS;
+DROP TABLE IF EXISTS "role";
 -- +goose StatementEnd

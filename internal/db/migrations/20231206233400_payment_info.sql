@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS payment_info(
     package bigint not null unique,
     tarrif bigint not null,
     foreign key (package) references package,
-    foregin key (tarrif) references tarrif
+    foreign key (tarrif) references tarrif
 );
 -- +goose StatementEnd
 
