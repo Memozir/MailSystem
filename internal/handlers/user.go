@@ -14,7 +14,7 @@ type UserJSON struct {
 	Phone      string `json:"phone"`
 	Pass       string `json:"pass"`
 	FirstName  string `json:"first_name"`
-	SecondName string `json:"last_name"`
+	SecondName string `json:"second_name"`
 	BirthDate  string `json:"birth_date"`
 }
 
@@ -29,13 +29,15 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 	}
 
 	log.Println(userJSON)
-	handler.Db.CreateUser(
+	userId := handler.Db.CreateUser(
 		userJSON.FirstName,
 		userJSON.SecondName,
 		userJSON.Phone,
 		userJSON.Pass,
 		userJSON.BirthDate)
 	rw.Header().Set("Content-type", "application/json")
+
+	fmt.Printf("User id: %d", userId)
 
 }
 
@@ -44,28 +46,3 @@ func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Requ
 	user := handler.Db.GetUserById(vars["id"])
 	fmt.Println(user)
 }
-
-// import (
-// 	"encoding/json"
-// 	"log"
-// 	"net/http"
-
-// 	"mail_system/internal/model"
-// )
-
-// type UserHandlers struct{}
-
-// func (handler *UserHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *http.Request) {
-// 	log.Println("User registration handler")
-
-// 	var user model.User
-// 	err := json.NewDecoder(r.Body).Decode(&user)
-
-// 	if err != nil {
-// 		log.Printf("User decode error: %s", err)
-// 	}
-
-// 	log.Println(user)
-// 	rw.Header().Set("Content-type", "application/json")
-
-// }

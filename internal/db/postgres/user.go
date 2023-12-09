@@ -15,19 +15,26 @@ func (db *PostgresDB) CreateUser(
 	second_name string,
 	phone string,
 	pass string,
-	birth string) {
+	birth string) uint8 {
 	ctx := context.TODO()
-	// var u User
-	db.connPool.QueryRow(ctx, "SELECT * FROM user;").Scan()
-	pgcon, err := db.connPool.Exec(ctx, `
-		INSERT INTO Users(phone, pass, first_name, second_name, birth_date)
-		VALUES($1, $2, $3, $4, $5)
-		`, phone, pass, first_name, second_name, birth)
+
+	// pgcon, err := db.connPool.Exec(ctx, `
+	// 	INSERT INTO "user"(phone, pass, first_name, last_name, birth_date)
+	// 	VALUES($1, $2, $3, $4, $5)
+	// 	`, phone, pass, first_name, second_name, birth)
+
+	var userId uint8
+	err := db.connPool.QueryRow(ctx, `
+	INSERT INTO "user"(phone, pass, first_name, last_name, birth_date)
+	VALUES($1, $2, $3, $4, $5) RETURNING id;
+	`, phone, pass, first_name, second_name, birth).Scan(&userId)
 
 	if err != nil {
 		log.Printf("Falied create user: %s", err.Error())
 	}
-	log.Printf("PGCON: %s", pgcon)
+	// log.Printf("PGCON: %s", pgcon)
+
+	return userId
 }
 
 func (db *PostgresDB) GetUserById(id string) *model.User {
@@ -39,8 +46,8 @@ func (db *PostgresDB) GetUserById(id string) *model.User {
 	}
 
 	res, err := db.connPool.Query(ctx, `
-		SELECT id, phone, pass, first_name, second_name, birth_date::text
-		FROM Users
+		SELECT id, phone, pass, first_name, last_name, birth_date::text
+		FROM "user"
 		WHERE id=$1
 	`, idInt)
 

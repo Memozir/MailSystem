@@ -55,8 +55,12 @@ func NewDb(ctx context.Context) (db *PostgresDB) {
 	db.connPool, err = pgxPool.New(ctx, url)
 
 	if err != nil {
-		log.Fatalf("Failed connection to Postgres: %s", err)
-		return db
+		// log.Fatalf("Failed connection to Postgres: %s", err)
+		log.Panicf("Failed connection to Postgres: %s", err)
+	}
+
+	if err = db.connPool.Ping(ctx); err != nil {
+		log.Panicf("Failed connection to Postgres: %s", err)
 	}
 
 	log.Printf("Connection to database on %s was Success", db.cfg.Host)

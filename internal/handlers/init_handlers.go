@@ -1,18 +1,21 @@
 package handlers
 
 import (
+	"context"
 	db "mail_system/internal/db/postgres"
 
 	"github.com/gorilla/mux"
 )
 
 type MailHandlers struct {
-	Db *db.PostgresDB
+	Context context.Context
+	Db      *db.PostgresDB
 }
 
-func NewMailHandler(db *db.PostgresDB) *MailHandlers {
+func NewMailHandler(ctx context.Context, db *db.PostgresDB) *MailHandlers {
 	return &MailHandlers{
-		Db: db,
+		Context: ctx,
+		Db:      db,
 	}
 }
 
@@ -22,6 +25,7 @@ func (mh *MailHandlers) LoadHandlers() *mux.Router {
 	// Adding handlers
 	mux.HandleFunc("/registration", mh.RegistrateUserHandler).Methods("POST")
 	mux.HandleFunc("/user/{id}", mh.GetUserHandler).Methods("GET")
+	mux.HandleFunc("/address", mh.CreateAddress).Methods("POST")
 
 	return mux
 }
