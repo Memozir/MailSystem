@@ -18,11 +18,6 @@ func (db *PostgresDB) CreateUser(
 	birth string) uint8 {
 	ctx := context.TODO()
 
-	// pgcon, err := db.connPool.Exec(ctx, `
-	// 	INSERT INTO "user"(phone, pass, first_name, last_name, birth_date)
-	// 	VALUES($1, $2, $3, $4, $5)
-	// 	`, phone, pass, first_name, second_name, birth)
-
 	var userId uint8
 	err := db.connPool.QueryRow(ctx, `
 	INSERT INTO "user"(phone, pass, first_name, last_name, birth_date)
@@ -32,7 +27,6 @@ func (db *PostgresDB) CreateUser(
 	if err != nil {
 		log.Printf("Falied create user: %s", err.Error())
 	}
-	// log.Printf("PGCON: %s", pgcon)
 
 	return userId
 }
@@ -64,4 +58,24 @@ func (db *PostgresDB) GetUserById(id string) *model.User {
 	}
 
 	return nil
+}
+
+func (db *PostgresDB) AuthUser(context context.Context, phone string) (bool, error) {
+	query := `
+		SELECT EXISTS(
+			SELECT 1
+			FROM client as c
+				INNER JOIN "user" as u
+					ON c.user = u.id
+			WHERE u.phone=$1
+		);
+		`
+	var exists bool
+	err := db.connPool.QueryRow(context, query, phone).Scan(&exists)
+
+	if err != nil {
+		return exists, err
+	}
+
+	return exists, nil
 }

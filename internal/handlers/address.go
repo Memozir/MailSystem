@@ -11,7 +11,7 @@ type AddresJson struct {
 }
 
 func (handler *MailHandlers) CreateAddress(rw http.ResponseWriter, r *http.Request) {
-	log.Println("User registration handler")
+	log.Println("Address registration handler")
 
 	var addresJson AddresJson
 	err := json.NewDecoder(r.Body).Decode(&addresJson)
