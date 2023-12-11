@@ -12,6 +12,7 @@ import (
 type UserJSON struct {
 	Id         uint64 `json:"id"`
 	Phone      string `json:"phone"`
+	Login      string `json:"login"`
 	Pass       string `json:"pass"`
 	FirstName  string `json:"first_name"`
 	SecondName string `json:"second_name"`
@@ -32,6 +33,7 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 	userId := handler.Db.CreateUser(
 		userJSON.FirstName,
 		userJSON.SecondName,
+		userJSON.Login,
 		userJSON.Phone,
 		userJSON.Pass,
 		userJSON.BirthDate)

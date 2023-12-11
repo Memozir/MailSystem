@@ -10,6 +10,7 @@ import (
 
 type ClientJSON struct {
 	Id         uint64 `json:"id"`
+	Login      string `json:"login"`
 	Phone      string `json:"phone"`
 	Pass       string `json:"pass"`
 	FirstName  string `json:"first_name"`
@@ -32,6 +33,7 @@ func (handler *MailHandlers) RegistrateClient(rw http.ResponseWriter, r *http.Re
 
 	log.Println(clientJSON)
 	userId := handler.Db.CreateUser(
+		clientJSON.Login,
 		clientJSON.FirstName,
 		clientJSON.SecondName,
 		clientJSON.Phone,

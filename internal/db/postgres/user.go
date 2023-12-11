@@ -13,6 +13,7 @@ import (
 func (db *PostgresDB) CreateUser(
 	first_name string,
 	second_name string,
+	login string,
 	phone string,
 	pass string,
 	birth string) uint8 {
@@ -20,9 +21,9 @@ func (db *PostgresDB) CreateUser(
 
 	var userId uint8
 	err := db.connPool.QueryRow(ctx, `
-	INSERT INTO "user"(phone, pass, first_name, last_name, birth_date)
-	VALUES($1, $2, $3, $4, $5) RETURNING id;
-	`, phone, pass, first_name, second_name, birth).Scan(&userId)
+	INSERT INTO "user"(phone, login, pass, first_name, last_name, birth_date)
+	VALUES($1, $2, $3, $4, $5, $6) RETURNING id;
+	`, phone, login, pass, first_name, second_name, birth).Scan(&userId)
 
 	if err != nil {
 		log.Printf("Falied create user: %s", err.Error())

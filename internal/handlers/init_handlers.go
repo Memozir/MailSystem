@@ -24,6 +24,7 @@ func (mh *MailHandlers) LoadHandlers() *mux.Router {
 
 	// Adding handlers
 	mux.HandleFunc("/registrate/client", mh.RegistrateClient).Methods("POST")
+	mux.HandleFunc("/registrate/employee", mh.RegistrateEmployee).Methods("POST")
 	mux.HandleFunc("/user/{id}", mh.GetUserHandler).Methods("GET")
 	mux.HandleFunc("/address", mh.CreateAddress).Methods("POST")
 	mux.HandleFunc("/auth/client", mh.AuthClient).Methods("POST")
