@@ -31,23 +31,23 @@ func graceFullShutdown(ctx context.Context, ch chan os.Signal, db db.Storage, se
 func main() {
 	utils.LoadEnv()
 
-	context := context.Background()
-	db := postgres.NewDb(context)
+	ctx := context.Background()
+	storage := postgres.NewDb(ctx)
 
-	handlers := handlers.NewMailHandler(context, db)
-	mux := handlers.LoadHandlers()
+	mailHandlers := handlers.NewMailHandler(storage)
+	mux := mailHandlers.LoadHandlers()
 
 	serverHost := os.Getenv("SERVER_HOST")
 	serverPort := os.Getenv("SERVER_PORT")
-	server, err := server.NewServer(serverHost, serverPort, mux)
+	MailServer, err := server.NewServer(serverHost, serverPort, mux)
 
-	if server == nil || err != nil {
+	if MailServer == nil || err != nil {
 		log.Fatal("Server have not started")
 	}
 
 	exit := make(chan os.Signal, 1)
-	go graceFullShutdown(context, exit, db, server)
+	go graceFullShutdown(ctx, exit, storage, MailServer)
 	signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
 
-	server.Start()
+	MailServer.Start()
 }

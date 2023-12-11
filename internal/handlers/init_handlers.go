@@ -9,25 +9,25 @@ import (
 
 type MailHandlers struct {
 	Context context.Context
-	Db      *db.PostgresDB
+	Db      db.Storage
 }
 
-func NewMailHandler(ctx context.Context, db *db.PostgresDB) *MailHandlers {
+func NewMailHandler(db db.Storage) *MailHandlers {
 	return &MailHandlers{
-		Context: ctx,
-		Db:      db,
+		Db: db,
 	}
 }
 
-func (mh *MailHandlers) LoadHandlers() *mux.Router {
-	mux := mux.NewRouter()
+func (handler *MailHandlers) LoadHandlers() *mux.Router {
+	router := mux.NewRouter()
 
 	// Adding handlers
-	mux.HandleFunc("/registrate/client", mh.RegistrateClient).Methods("POST")
-	mux.HandleFunc("/registrate/employee", mh.RegistrateEmployee).Methods("POST")
-	mux.HandleFunc("/user/{id}", mh.GetUserHandler).Methods("GET")
-	mux.HandleFunc("/address", mh.CreateAddress).Methods("POST")
-	mux.HandleFunc("/auth/client", mh.AuthClient).Methods("POST")
+	router.HandleFunc("/register/client", handler.RegistrateClientHandler).Methods("POST")
+	router.HandleFunc("/register/employee", handler.RegistrateEmployeeHandler).Methods("POST")
+	router.HandleFunc("/user/{id}", handler.GetUserHandler).Methods("GET")
+	router.HandleFunc("/address", handler.CreateAddressHandler).Methods("POST")
+	router.HandleFunc("/auth/client", handler.AuthClientHandler).Methods("POST")
+	router.HandleFunc("/create/role", handler.CreateRoleHandler).Methods("POST")
 
-	return mux
+	return router
 }

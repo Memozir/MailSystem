@@ -11,19 +11,19 @@ import (
 )
 
 func (db *PostgresDB) CreateUser(
-	first_name string,
-	second_name string,
+	ctx context.Context,
+	firstName string,
+	secondName string,
 	login string,
 	phone string,
 	pass string,
 	birth string) uint8 {
-	ctx := context.TODO()
 
 	var userId uint8
 	err := db.connPool.QueryRow(ctx, `
 	INSERT INTO "user"(phone, login, pass, first_name, last_name, birth_date)
 	VALUES($1, $2, $3, $4, $5, $6) RETURNING id;
-	`, phone, login, pass, first_name, second_name, birth).Scan(&userId)
+	`, phone, login, pass, firstName, secondName, birth).Scan(&userId)
 
 	if err != nil {
 		log.Printf("Falied create user: %s", err.Error())
@@ -32,7 +32,7 @@ func (db *PostgresDB) CreateUser(
 	return userId
 }
 
-func (db *PostgresDB) GetUserById(id string) *model.User {
+func (db *PostgresDB) GetUserById(id string) (*model.User, error) {
 	ctx := context.TODO()
 	idInt, err := strconv.ParseInt(id, 10, 64)
 
@@ -55,18 +55,18 @@ func (db *PostgresDB) GetUserById(id string) *model.User {
 			log.Printf("Get user by id query failed: %s", err)
 		}
 
-		return &user
+		return &user, err
 	}
 
-	return nil
+	return nil, err
 }
 
 func (db *PostgresDB) AuthUser(context context.Context, phone string) (bool, error) {
 	query := `
 		SELECT EXISTS(
 			SELECT 1
-			FROM client as c
-				INNER JOIN "user" as u
+			FROM client AS c
+				INNER JOIN "user" AS u
 					ON c.user = u.id
 			WHERE u.phone=$1
 		);

@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -30,7 +32,11 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 	}
 
 	log.Println(userJSON)
+	contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
+	defer cancelCreateUser()
+
 	userId := handler.Db.CreateUser(
+		contextCreateUser,
 		userJSON.FirstName,
 		userJSON.SecondName,
 		userJSON.Login,
@@ -40,11 +46,17 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 	rw.Header().Set("Content-type", "application/json")
 
 	fmt.Printf("User id: %d", userId)
-
 }
 
 func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	user := handler.Db.GetUserById(vars["id"])
+	user, err := handler.Db.GetUserById(vars["id"])
+
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	fmt.Println(user)
+	rw.WriteHeader(http.StatusOK)
 }

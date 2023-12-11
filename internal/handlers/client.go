@@ -23,7 +23,7 @@ type ClientCreateResponse struct {
 	ClientId string `json:"id"`
 }
 
-func (handler *MailHandlers) RegistrateClient(rw http.ResponseWriter, r *http.Request) {
+func (handler *MailHandlers) RegistrateClientHandler(rw http.ResponseWriter, r *http.Request) {
 	var clientJSON ClientJSON
 	err := json.NewDecoder(r.Body).Decode(&clientJSON)
 
@@ -32,7 +32,11 @@ func (handler *MailHandlers) RegistrateClient(rw http.ResponseWriter, r *http.Re
 	}
 
 	log.Println(clientJSON)
+	contextUserCreate, cancel := context.WithTimeout(r.Context(), time.Second*2)
+	defer cancel()
+
 	userId := handler.Db.CreateUser(
+		contextUserCreate,
 		clientJSON.Login,
 		clientJSON.FirstName,
 		clientJSON.SecondName,
@@ -40,10 +44,10 @@ func (handler *MailHandlers) RegistrateClient(rw http.ResponseWriter, r *http.Re
 		clientJSON.Pass,
 		clientJSON.BirthDate)
 
-	context, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	defer cancel()
+	contextCreateClient, cancelCreateClient := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancelCreateClient()
 
-	err = handler.Db.CreateClient(context, userId, clientJSON.Address)
+	err = handler.Db.CreateClient(contextCreateClient, userId, clientJSON.Address)
 
 	if err != nil {
 		log.Printf("client was not created: %s", err.Error())
@@ -59,7 +63,7 @@ type UserAuth struct {
 	Phone string `json:"phone"`
 }
 
-func (handler *MailHandlers) AuthClient(rw http.ResponseWriter, r *http.Request) {
+func (handler *MailHandlers) AuthClientHandler(rw http.ResponseWriter, r *http.Request) {
 	var userAuth UserAuth
 	err := json.NewDecoder(r.Body).Decode(&userAuth)
 
@@ -68,9 +72,9 @@ func (handler *MailHandlers) AuthClient(rw http.ResponseWriter, r *http.Request)
 		rw.WriteHeader(http.StatusBadRequest)
 	}
 
-	context, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	defer cancel()
-	exists, err := handler.Db.AuthUser(context, userAuth.Phone)
+	contextAuth, cancelAuth := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancelAuth()
+	exists, err := handler.Db.AuthUser(contextAuth, userAuth.Phone)
 
 	if err != nil {
 		log.Println(err.Error())

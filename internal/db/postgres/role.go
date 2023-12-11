@@ -12,3 +12,10 @@ func (db *PostgresDB) CreateRole(ctx context.Context, code uint8, name string) e
 
 	return err
 }
+
+func (db *PostgresDB) GetRoleByName(ctx context.Context, roleName string) (uint8, error) {
+	query := `SELECT code FROM "role" WHERE name=$1`
+	var roleCode uint8
+	err := db.connPool.QueryRow(ctx, query, roleName).Scan(&roleCode)
+	return roleCode, err
+}

@@ -1,16 +1,18 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 )
 
 type AddresJson struct {
 	Name string `json:"name"`
 }
 
-func (handler *MailHandlers) CreateAddress(rw http.ResponseWriter, r *http.Request) {
+func (handler *MailHandlers) CreateAddressHandler(rw http.ResponseWriter, r *http.Request) {
 	log.Println("Address registration handler")
 
 	var addresJson AddresJson
@@ -21,7 +23,10 @@ func (handler *MailHandlers) CreateAddress(rw http.ResponseWriter, r *http.Reque
 	}
 
 	log.Println(addresJson)
-	err = handler.Db.CreateAddress(handler.Context, addresJson.Name)
+	contextCreateAddress, cancelCreateAddress := context.WithTimeout(r.Context(), time.Second*2)
+	defer cancelCreateAddress()
+
+	err = handler.Db.CreateAddress(contextCreateAddress, addresJson.Name)
 
 	if err != nil {
 		log.Printf("Address was not created: %s", err.Error())

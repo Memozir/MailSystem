@@ -4,12 +4,32 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"mail_system/internal/model"
 	"os"
 
 	pgxPool "github.com/jackc/pgx/v5/pgxpool"
 
 	"mail_system/internal/config"
 )
+
+type Storage interface {
+	Reset()
+	CreateUser(ctx context.Context,
+		firstName string,
+		secondName string,
+		login string,
+		phone string,
+		pass string,
+		birth string) uint8
+	CreateEmployee(ctx context.Context, userId uint8, roleId uint8) (employeeId uint8, err error)
+	CreateRole(ctx context.Context, code uint8, name string) error
+	CreateAddress(ctx context.Context, name string) error
+	GetAddressByName(ctx context.Context, name string) (uint8, error)
+	CreateClient(ctx context.Context, userId uint8, addressName string) error
+	GetRoleByName(ctx context.Context, roleName string) (uint8, error)
+	GetUserById(id string) (*model.User, error)
+	AuthUser(context context.Context, phone string) (bool, error)
+}
 
 type PostgresDB struct {
 	connPool *pgxPool.Pool
@@ -23,14 +43,6 @@ func (db *PostgresDB) Reset() {
 func NewDb(ctx context.Context) (db *PostgresDB) {
 	db = new(PostgresDB)
 	var err error
-
-	// Host:         utils.GetEnvOrDefault("DB_HOST", "localhost"),
-	// Port:         utils.GetEnvOrDefault("DB_PORT", "5431"),
-	// Pass:         utils.GetEnvOrDefault("DB_PASSWORD", "postgres"),
-	// User:         utils.GetEnvOrDefault("DB_USER", "postgres"),
-	// DbName:       utils.GetEnvOrDefault("DB_NAME", "mail_system_db"),
-	// SSLMode:      utils.GetEnvOrDefault("DB_SSL_MODE", "disable"),
-	// MaxPoolConns: utils.GetEnvOrDefault("DB_MAX_CONN_POOLS", "10")}
 
 	db.cfg = &config.ConfigDb{
 		Host:         os.Getenv("DB_HOST"),
@@ -58,7 +70,6 @@ func NewDb(ctx context.Context) (db *PostgresDB) {
 		// log.Fatalf("Failed connection to Postgres: %s", err)
 		log.Panicf("Failed connection to Postgres: %s", err)
 	}
-
 	if err = db.connPool.Ping(ctx); err != nil {
 		log.Panicf("Failed connection to Postgres: %s", err)
 	}

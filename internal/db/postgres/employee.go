@@ -5,7 +5,7 @@ import (
 )
 
 func (db *PostgresDB) CreateEmployee(
-	ctx context.Context, userId string, roleId string) (employeeId uint8, err error) {
+	ctx context.Context, userId uint8, roleId uint8) (employeeId uint8, err error) {
 	query := `
 			INSERT INTO employee("user", "role") VALUES($1, $2) RETURNING id;
 		`
