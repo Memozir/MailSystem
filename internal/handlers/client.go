@@ -11,10 +11,10 @@ import (
 type ClientJSON struct {
 	Id         uint64 `json:"id"`
 	Login      string `json:"login"`
-	Phone      string `json:"phone"`
 	Pass       string `json:"pass"`
 	FirstName  string `json:"first_name"`
 	SecondName string `json:"second_name"`
+	MiddleName string `json:"middle_name"`
 	BirthDate  string `json:"birth_date"`
 	Address    string `json:"address"`
 }
@@ -23,7 +23,7 @@ type ClientCreateResponse struct {
 	ClientId string `json:"id"`
 }
 
-func (handler *MailHandlers) RegistrateClientHandler(rw http.ResponseWriter, r *http.Request) {
+func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *http.Request) {
 	var clientJSON ClientJSON
 	err := json.NewDecoder(r.Body).Decode(&clientJSON)
 
@@ -41,7 +41,7 @@ func (handler *MailHandlers) RegistrateClientHandler(rw http.ResponseWriter, r *
 		clientJSON.Login,
 		clientJSON.FirstName,
 		clientJSON.SecondName,
-		clientJSON.Phone,
+		clientJSON.MiddleName,
 		clientJSON.Pass,
 		clientJSON.BirthDate)
 
@@ -61,10 +61,11 @@ func (handler *MailHandlers) RegistrateClientHandler(rw http.ResponseWriter, r *
 }
 
 type UserAuth struct {
-	Phone string `json:"phone"`
+	Login string `json:"login"`
+	Pass  string `json:"pass"`
 }
 
-func (handler *MailHandlers) AuthClientHandler(rw http.ResponseWriter, r *http.Request) {
+func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Request) {
 	var userAuth UserAuth
 	err := json.NewDecoder(r.Body).Decode(&userAuth)
 
@@ -75,7 +76,7 @@ func (handler *MailHandlers) AuthClientHandler(rw http.ResponseWriter, r *http.R
 
 	contextAuth, cancelAuth := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancelAuth()
-	exists, err := handler.Db.AuthUser(contextAuth, userAuth.Phone)
+	exists, err := handler.Db.AuthUser(contextAuth, userAuth.Login, userAuth.Pass)
 
 	if err != nil {
 		log.Println(err.Error())

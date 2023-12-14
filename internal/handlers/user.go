@@ -19,10 +19,11 @@ type UserJSON struct {
 	Pass       string `json:"pass"`
 	FirstName  string `json:"first_name"`
 	SecondName string `json:"second_name"`
+	MiddleName string `json:"middle_name"`
 	BirthDate  string `json:"birth_date"`
 }
 
-func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *http.Request) {
+func (handler *MailHandlers) RegisterUserHandler(rw http.ResponseWriter, r *http.Request) {
 	log.Println("User registration handler")
 
 	var userJSON UserJSON
@@ -41,8 +42,8 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 		cancelCreateUser,
 		userJSON.FirstName,
 		userJSON.SecondName,
+		userJSON.MiddleName,
 		userJSON.Login,
-		userJSON.Phone,
 		userJSON.Pass,
 		userJSON.BirthDate)
 	rw.Header().Set("Content-type", "application/json")

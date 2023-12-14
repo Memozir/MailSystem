@@ -16,16 +16,16 @@ func (db *PostgresDB) CreateUser(
 	cancelFunc context.CancelFunc,
 	firstName string,
 	secondName string,
+	middleName string,
 	login string,
-	phone string,
 	pass string,
 	birth string) ResultDB {
 
 	var userId uint8
 	err := db.connPool.QueryRow(ctx, `
-	INSERT INTO "user"(phone, login, pass, first_name, last_name, birth_date)
+	INSERT INTO "user"(login, pass, first_name, last_name, middle_name, birth_date)
 	VALUES($1, $2, $3, $4, $5, $6) RETURNING id;
-	`, phone, login, pass, firstName, secondName, birth).Scan(&userId)
+	`, login, pass, firstName, secondName, middleName, birth).Scan(&userId)
 
 	if err != nil {
 		log.Printf("Falied create user: %s", err.Error())
@@ -64,18 +64,18 @@ func (db *PostgresDB) GetUserById(id string) ResultDB {
 	return ResultDB{Err: err}
 }
 
-func (db *PostgresDB) AuthUser(context context.Context, phone string) (bool, error) {
+func (db *PostgresDB) AuthUser(context context.Context, login string, pass string) (bool, error) {
 	query := `
 		SELECT EXISTS(
 			SELECT 1
 			FROM client AS c
 				INNER JOIN "user" AS u
 					ON c.user = u.id
-			WHERE u.phone=$1
+			WHERE u.login=$1 and u.pass=$2
 		);
 		`
 	var exists bool
-	err := db.connPool.QueryRow(context, query, phone).Scan(&exists)
+	err := db.connPool.QueryRow(context, query, login, pass).Scan(&exists)
 
 	if err != nil {
 		return exists, err

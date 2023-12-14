@@ -45,8 +45,8 @@ func (handler *MailHandlers) RegistrateEmployeeHandler(rw http.ResponseWriter, r
 			emp.User.FirstName,
 			emp.User.SecondName,
 			emp.User.Login,
-			emp.User.Phone,
 			emp.User.Pass,
+			emp.User.MiddleName,
 			emp.User.BirthDate)
 	}()
 

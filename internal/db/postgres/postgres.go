@@ -22,8 +22,8 @@ type Storage interface {
 		cancelFunc context.CancelFunc,
 		firstName string,
 		secondName string,
+		middleName string,
 		login string,
-		phone string,
 		pass string,
 		birth string) ResultDB
 	CreateEmployee(ctx context.Context, userId uint8, roleId uint8) ResultDB
@@ -33,7 +33,7 @@ type Storage interface {
 	CreateClient(ctx context.Context, userId uint8, addressName string) error
 	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
 	GetUserById(id string) ResultDB
-	AuthUser(context context.Context, phone string) (bool, error)
+	AuthUser(context context.Context, login string, pass string) (bool, error)
 }
 
 type PostgresDB struct {
