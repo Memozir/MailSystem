@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-func (db *PostgresDB) CreateRole(ctx context.Context, cancelFunc context.CancelFunc, code uint8, name string) ResultDB {
+func (db *PostgresDB) CreateRole(ctx context.Context, code uint8, name string) ResultDB {
 	query := `
 		INSERT INTO role VALUES ($1, $2);
 	`

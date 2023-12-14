@@ -27,7 +27,7 @@ type Storage interface {
 		pass string,
 		birth string) ResultDB
 	CreateEmployee(ctx context.Context, userId uint8, roleId uint8) ResultDB
-	CreateRole(ctx context.Context, cancelFunc context.CancelFunc, code uint8, name string) ResultDB
+	CreateRole(ctx context.Context, code uint8, name string) ResultDB
 	CreateAddress(ctx context.Context, name string) error
 	GetAddressByName(ctx context.Context, name string) (uint8, error)
 	CreateClient(ctx context.Context, userId uint8, addressName string) error
