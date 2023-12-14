@@ -4,18 +4,23 @@ import (
 	"context"
 )
 
-func (db *PostgresDB) CreateRole(ctx context.Context, code uint8, name string) error {
+func (db *PostgresDB) CreateRole(ctx context.Context, cancelFunc context.CancelFunc, code uint8, name string) ResultDB {
 	query := `
 		INSERT INTO role VALUES ($1, $2);
 	`
 	_, err := db.connPool.Exec(ctx, query, code, name)
 
-	return err
+	return ResultDB{Err: err}
 }
 
-func (db *PostgresDB) GetRoleByName(ctx context.Context, roleName string) (uint8, error) {
+func (db *PostgresDB) GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB {
 	query := `SELECT code FROM "role" WHERE name=$1`
 	var roleCode uint8
 	err := db.connPool.QueryRow(ctx, query, roleName).Scan(&roleCode)
-	return roleCode, err
+
+	if err != nil {
+		cancelFunc()
+	}
+
+	return ResultDB{roleCode, err}
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	db "mail_system/internal/db/postgres"
 	"net/http"
 	"time"
 )
@@ -24,39 +25,57 @@ func (handler *MailHandlers) RegistrateEmployeeHandler(rw http.ResponseWriter, r
 
 	if err != nil {
 		log.Printf("Registration employee error: %s", err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		r.Context().Done()
 	}
+
 	contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
 	defer cancelCreateUser()
 
-	user := handler.Db.CreateUser(
-		contextCreateUser,
-		emp.User.FirstName,
-		emp.User.SecondName,
-		emp.User.Login,
-		emp.User.Phone,
-		emp.User.Pass,
-		emp.User.BirthDate)
+	contextGetRole, cancelGetRole := context.WithTimeout(r.Context(), time.Second*2)
+	defer cancelGetRole()
 
-	contextCreateRole, cancelCreateRole := context.WithTimeout(r.Context(), time.Second*2)
-	defer cancelCreateRole()
+	userCh := make(chan db.ResultDB)
+	roleCh := make(chan db.ResultDB)
 
-	role, err := handler.Db.GetRoleByName(contextCreateRole, emp.Role.Name)
+	go func() {
+		userCh <- handler.Db.CreateUser(
+			contextCreateUser,
+			cancelCreateUser,
+			emp.User.FirstName,
+			emp.User.SecondName,
+			emp.User.Login,
+			emp.User.Phone,
+			emp.User.Pass,
+			emp.User.BirthDate)
+	}()
 
-	if err != nil {
-		rw.WriteHeader(http.StatusBadRequest)
-		return
+	go func() {
+		roleCh <- handler.Db.GetRoleByName(contextGetRole, cancelGetRole, emp.Role.Name)
+	}()
+
+	var user db.ResultDB
+	var role db.ResultDB
+
+	for i := 0; i < 2; i++ {
+		select {
+		case user = <-userCh:
+			continue
+		case role = <-roleCh:
+			continue
+		}
 	}
 
 	contextCreateEmployee, cancelCreateEmployee := context.WithTimeout(r.Context(), time.Second*2)
 	defer cancelCreateEmployee()
 
-	_, err = handler.Db.CreateEmployee(contextCreateEmployee, user, role)
+	//var empRes db.ResultDB
+	employeeCreateResult := handler.Db.CreateEmployee(contextCreateEmployee, user.Val.(uint8), role.Val.(uint8))
 
-	if err != nil {
+	if employeeCreateResult.Err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
-		return
+		r.Context().Done()
 	}
 
 	rw.WriteHeader(http.StatusCreated)
-	fmt.Println(emp)
 }

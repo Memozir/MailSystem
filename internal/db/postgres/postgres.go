@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"mail_system/internal/model"
 	"os"
 
 	pgxPool "github.com/jackc/pgx/v5/pgxpool"
@@ -12,22 +11,28 @@ import (
 	"mail_system/internal/config"
 )
 
+type ResultDB struct {
+	Val any
+	Err error
+}
+
 type Storage interface {
 	Reset()
 	CreateUser(ctx context.Context,
+		cancelFunc context.CancelFunc,
 		firstName string,
 		secondName string,
 		login string,
 		phone string,
 		pass string,
-		birth string) uint8
-	CreateEmployee(ctx context.Context, userId uint8, roleId uint8) (employeeId uint8, err error)
-	CreateRole(ctx context.Context, code uint8, name string) error
+		birth string) ResultDB
+	CreateEmployee(ctx context.Context, userId uint8, roleId uint8) ResultDB
+	CreateRole(ctx context.Context, cancelFunc context.CancelFunc, code uint8, name string) ResultDB
 	CreateAddress(ctx context.Context, name string) error
 	GetAddressByName(ctx context.Context, name string) (uint8, error)
 	CreateClient(ctx context.Context, userId uint8, addressName string) error
-	GetRoleByName(ctx context.Context, roleName string) (uint8, error)
-	GetUserById(id string) (*model.User, error)
+	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
+	GetUserById(id string) ResultDB
 	AuthUser(context context.Context, phone string) (bool, error)
 }
 

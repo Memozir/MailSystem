@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -12,12 +13,13 @@ import (
 
 func (db *PostgresDB) CreateUser(
 	ctx context.Context,
+	cancelFunc context.CancelFunc,
 	firstName string,
 	secondName string,
 	login string,
 	phone string,
 	pass string,
-	birth string) uint8 {
+	birth string) ResultDB {
 
 	var userId uint8
 	err := db.connPool.QueryRow(ctx, `
@@ -27,12 +29,13 @@ func (db *PostgresDB) CreateUser(
 
 	if err != nil {
 		log.Printf("Falied create user: %s", err.Error())
+		cancelFunc()
 	}
-
-	return userId
+	fmt.Println(userId)
+	return ResultDB{userId, err}
 }
 
-func (db *PostgresDB) GetUserById(id string) (*model.User, error) {
+func (db *PostgresDB) GetUserById(id string) ResultDB {
 	ctx := context.TODO()
 	idInt, err := strconv.ParseInt(id, 10, 64)
 
@@ -55,10 +58,10 @@ func (db *PostgresDB) GetUserById(id string) (*model.User, error) {
 			log.Printf("Get user by id query failed: %s", err)
 		}
 
-		return &user, err
+		return ResultDB{user, err}
 	}
 
-	return nil, err
+	return ResultDB{Err: err}
 }
 
 func (db *PostgresDB) AuthUser(context context.Context, phone string) (bool, error) {

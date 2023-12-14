@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"mail_system/internal/db"
+	db "mail_system/internal/db/postgres"
 	postgres "mail_system/internal/db/postgres"
 	"mail_system/internal/handlers"
 	"mail_system/internal/server"

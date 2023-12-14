@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mail_system/internal/model"
 	"net/http"
 	"time"
 
@@ -37,6 +38,7 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 
 	userId := handler.Db.CreateUser(
 		contextCreateUser,
+		cancelCreateUser,
 		userJSON.FirstName,
 		userJSON.SecondName,
 		userJSON.Login,
@@ -45,18 +47,18 @@ func (handler *MailHandlers) RegistrateUserHandler(rw http.ResponseWriter, r *ht
 		userJSON.BirthDate)
 	rw.Header().Set("Content-type", "application/json")
 
-	fmt.Printf("User id: %d", userId)
+	fmt.Printf("User id: %d", userId.Val.(uint8))
 }
 
 func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	user, err := handler.Db.GetUserById(vars["id"])
+	user := handler.Db.GetUserById(vars["id"])
 
-	if err != nil {
+	if user.Err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	fmt.Println(user)
+	fmt.Println(user.Val.(model.User))
 	rw.WriteHeader(http.StatusOK)
 }

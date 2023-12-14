@@ -17,12 +17,12 @@ func (handler *MailHandlers) CreateRoleHandler(rw http.ResponseWriter, r *http.R
 	var role RoleJSON
 	json.NewDecoder(r.Body).Decode(&role)
 
-	context, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	contextCreateRole, cancel := context.WithTimeout(r.Context(), time.Second*2)
 	defer cancel()
-	err := handler.Db.CreateRole(context, role.Code, role.Name)
+	err := handler.Db.CreateRole(contextCreateRole, cancel, role.Code, role.Name)
 
-	if err != nil {
-		log.Printf("Role was not created: %s", err.Error())
+	if err.Err != nil {
+		log.Printf("Role was not created: %s", err.Err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
 		rw.WriteHeader(http.StatusCreated)
