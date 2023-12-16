@@ -30,7 +30,7 @@ type Storage interface {
 	CreateRole(ctx context.Context, code uint8, name string) ResultDB
 	CreateAddress(ctx context.Context, name string) error
 	GetAddressByName(ctx context.Context, name string) (uint8, error)
-	CreateClient(ctx context.Context, userId uint8, addressName string) error
+	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
 	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
 	GetUserById(id string) ResultDB
 	AuthUser(context context.Context, login string, pass string) (bool, error)

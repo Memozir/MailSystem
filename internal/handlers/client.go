@@ -17,6 +17,7 @@ type ClientJSON struct {
 	MiddleName string `json:"middle_name"`
 	BirthDate  string `json:"birth_date"`
 	Address    string `json:"address"`
+	Apartment  string `json:"apartment"`
 }
 
 type ClientCreateResponse struct {
@@ -38,17 +39,17 @@ func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *ht
 	userId := handler.Db.CreateUser(
 		contextUserCreate,
 		cancel,
-		clientJSON.Login,
 		clientJSON.FirstName,
 		clientJSON.SecondName,
 		clientJSON.MiddleName,
+		clientJSON.Login,
 		clientJSON.Pass,
 		clientJSON.BirthDate)
 
 	contextCreateClient, cancelCreateClient := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancelCreateClient()
 
-	err = handler.Db.CreateClient(contextCreateClient, userId.Val.(uint8), clientJSON.Address)
+	err = handler.Db.CreateClient(contextCreateClient, userId.Val.(uint8), clientJSON.Address, clientJSON.Apartment)
 
 	if err != nil {
 		log.Printf("client was not created: %s", err.Error())
