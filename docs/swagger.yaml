@@ -1,0 +1,49 @@
+basePath: /
+definitions:
+  handlers.UserAuthRequest:
+    properties:
+      login:
+        type: string
+      pass:
+        type: string
+    type: object
+  handlers.UserAuthResponse:
+    properties:
+      role:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: soberkoder@swagger.io
+    name: API Support
+  description: This is a service for managing mail system
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  version: "1.0"
+paths:
+  /auth/user:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with the input payload
+      parameters:
+      - description: The input todo struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UserAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserAuthResponse'
+      summary: Create a new UserAuthRequest
+      tags:
+      - auth
+swagger: "2.0"

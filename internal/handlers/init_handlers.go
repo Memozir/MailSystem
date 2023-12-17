@@ -2,9 +2,14 @@ package handlers
 
 import (
 	"context"
+
 	db "mail_system/internal/db/postgres"
 
 	"github.com/gorilla/mux"
+
+	httpSwagger "github.com/swaggo/http-swagger"
+	//_ "mail_system/internal/handlers/docs"
+	_ "mail_system/docs"
 )
 
 type MailHandlers struct {
@@ -18,6 +23,16 @@ func NewMailHandler(db db.Storage) *MailHandlers {
 	}
 }
 
+// LoadHandlers @title MailSystem API
+// @version 1.0
+// @description This is a service for managing mail system
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email soberkoder@swagger.io
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8080
+// @BasePath /
 func (handler *MailHandlers) LoadHandlers() *mux.Router {
 	router := mux.NewRouter()
 
@@ -28,6 +43,8 @@ func (handler *MailHandlers) LoadHandlers() *mux.Router {
 	router.HandleFunc("/address", handler.CreateAddressHandler).Methods("POST")
 	router.HandleFunc("/auth/user", handler.AuthUserHandler).Methods("POST")
 	router.HandleFunc("/create/role", handler.CreateRoleHandler).Methods("POST")
+
+	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 
 	return router
 }

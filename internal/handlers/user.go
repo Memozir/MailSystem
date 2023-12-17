@@ -74,6 +74,15 @@ type UserAuthResponse struct {
 	Role int8 `json:"role"`
 }
 
+// AuthUserHandler AuthUser godoc
+// @Summary Create a new UserAuthRequest
+// @Description Create a new order with the input payload
+// @Tags auth
+// @Accept  json
+// @Param data body UserAuthRequest true
+// @Produce  json
+// @Success 200 {object} UserAuthResponse
+// @Router /auth/user [post]
 func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Request) {
 	var userAuth UserAuthRequest
 	err := json.NewDecoder(r.Body).Decode(&userAuth)
