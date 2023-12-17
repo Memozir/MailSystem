@@ -107,6 +107,7 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
+			log.Println(err.Error())
 		}
 
 		rw.WriteHeader(http.StatusOK)
