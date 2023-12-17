@@ -33,7 +33,7 @@ type Storage interface {
 	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
 	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
 	GetUserById(id string) ResultDB
-	AuthUser(ctx context.Context, login string, pass string) ResultDB
+	AuthUser(ctx context.Context, login string, pass string) (ResultDB, error)
 }
 
 type PostgresDB struct {

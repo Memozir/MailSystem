@@ -94,9 +94,10 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 
 	//contextAuth, cancelAuth := context.WithTimeout(context.Background(), time.Second*2)
 	//defer cancelAuth()
-	res := handler.Db.AuthUser(context.Background(), userAuth.Login, userAuth.Pass)
+	res, err := handler.Db.AuthUser(context.Background(), userAuth.Login, userAuth.Pass)
 
-	if res.Err != nil {
+	if err != nil {
+		log.Println("USER WAS NOT FOUND AND AUTHORIZED")
 		log.Println(err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else if res.Val.(model.UserAuth).ClientId > 0 {

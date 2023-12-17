@@ -63,7 +63,7 @@ func (db *PostgresDB) GetUserById(id string) ResultDB {
 	return ResultDB{Err: err}
 }
 
-func (db *PostgresDB) AuthUser(ctx context.Context, login string, pass string) ResultDB {
+func (db *PostgresDB) AuthUser(ctx context.Context, login string, pass string) (ResultDB, error) {
 	query := `
 		SELECT
 		    COALESCE(c.id, 0) as client_id,
@@ -81,5 +81,5 @@ func (db *PostgresDB) AuthUser(ctx context.Context, login string, pass string) R
 	var userAuth model.UserAuth
 	err := db.connPool.QueryRow(ctx, query, login, pass).Scan(&userAuth.ClientId, &userAuth.RoleCode)
 
-	return ResultDB{Val: userAuth, Err: err}
+	return ResultDB{Val: userAuth, Err: err}, err
 }
