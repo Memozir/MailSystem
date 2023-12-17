@@ -23,3 +23,8 @@ func (user *User) String() string {
 		user.LastName,
 		user.BirthDate)
 }
+
+type UserAuth struct {
+	ClientId uint64 `db:"client_id"`
+	RoleCode int8   `db:"role_code"`
+}

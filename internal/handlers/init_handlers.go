@@ -26,7 +26,7 @@ func (handler *MailHandlers) LoadHandlers() *mux.Router {
 	router.HandleFunc("/register/employee", handler.RegistrateEmployeeHandler).Methods("POST")
 	router.HandleFunc("/user/{id}", handler.GetUserHandler).Methods("GET")
 	router.HandleFunc("/address", handler.CreateAddressHandler).Methods("POST")
-	router.HandleFunc("/auth/client", handler.AuthUserHandler).Methods("POST")
+	router.HandleFunc("/auth/user", handler.AuthUserHandler).Methods("POST")
 	router.HandleFunc("/create/role", handler.CreateRoleHandler).Methods("POST")
 
 	return router

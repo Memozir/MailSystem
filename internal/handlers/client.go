@@ -60,35 +60,3 @@ func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *ht
 
 	rw.Header().Set("Content-type", "application/json")
 }
-
-type UserAuth struct {
-	Login string `json:"login"`
-	Pass  string `json:"pass"`
-}
-
-func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Request) {
-	var userAuth UserAuth
-	err := json.NewDecoder(r.Body).Decode(&userAuth)
-
-	if err != nil {
-		log.Println(err.Error())
-		rw.WriteHeader(http.StatusBadRequest)
-	}
-
-	contextAuth, cancelAuth := context.WithTimeout(context.Background(), time.Second*2)
-	defer cancelAuth()
-	exists, err := handler.Db.AuthUser(contextAuth, userAuth.Login, userAuth.Pass)
-
-	if err != nil {
-		log.Println(err.Error())
-		rw.WriteHeader(http.StatusBadRequest)
-	}
-
-	if exists {
-		log.Println("SUCCESS AUTH")
-		rw.WriteHeader(http.StatusOK)
-	} else {
-		log.Println("ERROR AUTH")
-		rw.WriteHeader(http.StatusBadRequest)
-	}
-}

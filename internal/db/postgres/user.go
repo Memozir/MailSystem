@@ -64,22 +64,23 @@ func (db *PostgresDB) GetUserById(id string) ResultDB {
 	return ResultDB{Err: err}
 }
 
-func (db *PostgresDB) AuthUser(context context.Context, login string, pass string) (bool, error) {
+func (db *PostgresDB) AuthUser(ctx context.Context, login string, pass string) ResultDB {
 	query := `
-		SELECT EXISTS(
-			SELECT 1
-			FROM client AS c
-				INNER JOIN "user" AS u
-					ON c.user = u.id
-			WHERE u.login=$1 and u.pass=$2
-		);
+		SELECT
+		    COALESCE(c.id, 0) as client_id,
+		    COALESCE(emp.code, 0) as role_code
+		FROM "user" AS u
+         LEFT JOIN client AS c
+                    ON u.id = c.user
+         LEFT JOIN (SELECT "user" user_id, r.code code
+                  FROM employee as e
+                    INNER JOIN "role" as r
+                      on e.role = r.code) as emp
+             ON u.id = emp.user_id
+		WHERE u.login=$1 and u.pass=$2;
 		`
-	var exists bool
-	err := db.connPool.QueryRow(context, query, login, pass).Scan(&exists)
+	var userAuth model.UserAuth
+	err := db.connPool.QueryRow(ctx, query, login, pass).Scan(&userAuth.RoleCode, &userAuth.ClientId)
 
-	if err != nil {
-		return exists, err
-	}
-
-	return exists, nil
+	return ResultDB{Val: userAuth, Err: err}
 }

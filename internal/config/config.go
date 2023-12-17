@@ -9,3 +9,7 @@ type ConfigDb struct {
 	SSLMode      string
 	MaxPoolConns string
 }
+
+const (
+	UserRole int8 = 0
+)

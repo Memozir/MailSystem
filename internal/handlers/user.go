@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mail_system/internal/config"
 	"mail_system/internal/model"
 	"net/http"
 	"time"
@@ -62,4 +63,55 @@ func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Requ
 
 	fmt.Println(user.Val.(model.User))
 	rw.WriteHeader(http.StatusOK)
+}
+
+type UserAuthRequest struct {
+	Login string `json:"login"`
+	Pass  string `json:"pass"`
+}
+
+type UserAuthResponse struct {
+	Role int8 `json:"role"`
+}
+
+func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Request) {
+	var userAuth UserAuthRequest
+	err := json.NewDecoder(r.Body).Decode(&userAuth)
+
+	if err != nil {
+		log.Println(err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+	}
+
+	//contextAuth, cancelAuth := context.WithTimeout(context.Background(), time.Second*2)
+	//defer cancelAuth()
+	res := handler.Db.AuthUser(context.Background(), userAuth.Login, userAuth.Pass)
+
+	if res.Err != nil {
+		log.Println(err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+	} else if res.Val.(model.UserAuth).ClientId > 0 {
+		log.Println("SUCCESS CLIENT AUTH")
+
+		response := UserAuthResponse{Role: config.UserRole}
+		err = json.NewEncoder(rw).Encode(&response)
+
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+		}
+
+		rw.WriteHeader(http.StatusOK)
+	} else if res.Val.(model.UserAuth).RoleCode != 0 {
+		log.Println("SUCCESS CLIENT AUTH")
+
+		response := UserAuthResponse{Role: res.Val.(model.UserAuth).RoleCode}
+		err = json.NewEncoder(rw).Encode(response)
+
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+		}
+	} else {
+		log.Println("ERROR AUTH")
+		rw.WriteHeader(http.StatusBadRequest)
+	}
 }
