@@ -79,7 +79,7 @@ func (db *PostgresDB) AuthUser(ctx context.Context, login string, pass string) R
 		WHERE u.login=$1 and u.pass=$2;
 		`
 	var userAuth model.UserAuth
-	err := db.connPool.QueryRow(ctx, query, login, pass).Scan(&userAuth.RoleCode, &userAuth.ClientId)
+	err := db.connPool.QueryRow(ctx, query, login, pass).Scan(&userAuth.ClientId, &userAuth.RoleCode)
 
 	return ResultDB{Val: userAuth, Err: err}
 }
