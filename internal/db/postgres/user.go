@@ -3,10 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"log"
 	"strconv"
-
-	"github.com/jackc/pgx/v5"
 
 	"mail_system/internal/model"
 )

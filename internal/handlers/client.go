@@ -5,19 +5,19 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
 type ClientJSON struct {
-	Id         uint64 `json:"id"`
-	Login      string `json:"login"`
-	Pass       string `json:"pass"`
-	FirstName  string `json:"first_name"`
-	SecondName string `json:"second_name"`
-	MiddleName string `json:"middle_name"`
-	BirthDate  string `json:"birth_date"`
-	Address    string `json:"address"`
-	Apartment  string `json:"apartment"`
+	Id          uint64 `json:"id"`
+	Login       string `json:"login"`
+	Pass        string `json:"pass"`
+	FirstName   string `json:"first_name"`
+	SecondName  string `json:"second_name"`
+	MiddleName  string `json:"middle_name"`
+	BirthDate   string `json:"birth_date"`
+	FullAddress string `json:"address"`
 }
 
 type ClientCreateResponse struct {
@@ -49,7 +49,8 @@ func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *ht
 	contextCreateClient, cancelCreateClient := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancelCreateClient()
 
-	err = handler.Db.CreateClient(contextCreateClient, userId.Val.(uint8), clientJSON.Address, clientJSON.Apartment)
+	addressParts := strings.Split(clientJSON.FullAddress, " ")
+	err = handler.Db.CreateClient(contextCreateClient, userId.Val.(uint8), addressParts[0], addressParts[1])
 
 	if err != nil {
 		log.Printf("client was not created: %s", err.Error())

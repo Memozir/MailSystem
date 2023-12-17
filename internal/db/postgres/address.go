@@ -16,10 +16,10 @@ func (db *PostgresDB) CreateAddress(ctx context.Context, name string) error {
 	return nil
 }
 
-func (db *PostgresDB) GetAddressByName(ctx context.Context, name string) (uint8, error) {
+func (db *PostgresDB) GetAddressByName(ctx context.Context, addressName string, apartment string) (uint8, error) {
 	var addressId uint8
-	query := `SELECT id FROM "address" WHERE "name" = $1;`
-	err := db.connPool.QueryRow(ctx, query, name).Scan(&addressId)
+	query := `SELECT id FROM "address" WHERE "name" = $1 and apartment = $2;`
+	err := db.connPool.QueryRow(ctx, query, addressName, apartment).Scan(&addressId)
 
 	if err != nil {
 		return addressId, err
