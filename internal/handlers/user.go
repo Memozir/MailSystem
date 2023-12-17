@@ -118,6 +118,7 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 		err = json.NewEncoder(rw).Encode(response)
 
 		if err != nil {
+			log.Println(err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		}
 	} else {
