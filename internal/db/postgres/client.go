@@ -16,3 +16,13 @@ func (db *PostgresDB) CreateClient(ctx context.Context, userId uint8, addressNam
 
 	return nil
 }
+
+func (db *PostgresDB) AddPackageToClient(ctx context.Context, clientId uint64, packageId uint64) error {
+	query := `
+		INSERT INTO client_package(client, package) VALUES($1, $2);
+	`
+
+	_, err := db.connPool.Query(ctx, query, clientId, packageId)
+
+	return err
+}

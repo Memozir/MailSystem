@@ -3,10 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"log"
-	"strconv"
-
 	"mail_system/internal/model"
 )
 
@@ -34,33 +31,50 @@ func (db *PostgresDB) CreateUser(
 	return ResultDB{userId, err}
 }
 
-func (db *PostgresDB) GetUserById(id string) ResultDB {
-	ctx := context.TODO()
-	idInt, err := strconv.ParseInt(id, 10, 64)
+func (db *PostgresDB) GetUserIdByLogin(ctx context.Context, login string) (ResultDB, error) {
+	query := `
+		SELECT id
+		FROM client
+		WHERE login=$1`
+
+	var userId uint64
+	err := db.connPool.QueryRow(ctx, query, login).Scan(&userId)
 
 	if err != nil {
-		log.Println(err)
+		return ResultDB{}, err
 	}
 
-	res, err := db.connPool.Query(ctx, `
-		SELECT id, phone, pass, first_name, last_name, birth_date::text
-		FROM "user"
-		WHERE id=$1
-	`, idInt)
+	return ResultDB{userId, err}, err
+}
+
+type SenderReceiverRes struct {
+	Sender   uint64 `db:"sender"`
+	Receiver uint64 `db:"receiver"`
+}
+
+func (db *PostgresDB) GetSenderReceiverIdByLogin(ctx context.Context, senderLogin string, receiverLogin string) (ResultDB, error) {
+	query := `
+		SELECT
+		(
+			SELECT id
+			FROM client
+			WHERE login = $1
+		) sender,
+		(
+			SELECT id
+			FROM client
+			WHERE login = $2
+		) receiver;
+		`
+
+	var senderReceiver SenderReceiverRes
+	err := db.connPool.QueryRow(ctx, query, senderLogin, receiverLogin).Scan(&senderReceiver)
 
 	if err != nil {
-		log.Printf("Get user by id failed: %s", err)
-	} else {
-		user, err := pgx.CollectOneRow(res, pgx.RowToStructByPos[model.User])
-
-		if err != nil {
-			log.Printf("Get user by id query failed: %s", err)
-		}
-
-		return ResultDB{user, err}
+		return ResultDB{}, err
 	}
 
-	return ResultDB{Err: err}
+	return ResultDB{senderReceiver, err}, err
 }
 
 func (db *PostgresDB) AuthUser(ctx context.Context, login string, pass string) (ResultDB, error) {

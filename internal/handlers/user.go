@@ -9,8 +9,6 @@ import (
 	"mail_system/internal/model"
 	"net/http"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 type UserJSON struct {
@@ -52,6 +50,7 @@ func (handler *MailHandlers) RegisterUserHandler(rw http.ResponseWriter, r *http
 	fmt.Printf("User id: %d", userId.Val.(uint8))
 }
 
+/*
 func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user := handler.Db.GetUserById(vars["id"])
@@ -64,6 +63,7 @@ func (handler *MailHandlers) GetUserHandler(rw http.ResponseWriter, r *http.Requ
 	fmt.Println(user.Val.(model.User))
 	rw.WriteHeader(http.StatusOK)
 }
+*/
 
 type UserAuthRequest struct {
 	Login string `json:"login"`
@@ -103,7 +103,7 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 	} else if res.Val.(model.UserAuth).ClientId > 0 {
 		log.Println("SUCCESS CLIENT AUTH")
 
-		response := UserAuthResponse{Role: config.UserRole}
+		response := UserAuthResponse{Role: config.USER_ROLE}
 		err = json.NewEncoder(rw).Encode(&response)
 
 		if err != nil {

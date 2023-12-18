@@ -32,8 +32,28 @@ type Storage interface {
 	GetAddressByName(ctx context.Context, addressName string, apartment string) (uint8, error)
 	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
 	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
-	GetUserById(id string) ResultDB
 	AuthUser(ctx context.Context, login string, pass string) (ResultDB, error)
+	AddPackageToClient(ctx context.Context, clientId uint64, packageId uint64) error
+	GetDepartmentByReceiver(ctx context.Context, receiverId uint64) (uint64, error)
+	GetEmployeeByLogin(ctx context.Context, login string) (uint64, error)
+	ProducePaymentInfo(ctx context.Context, packageId uint64, packageType int, weight int) error
+	AddEmployeeToPackageResponsibleList(ctx context.Context, employeeId uint64, packageId uint64) error
+	GetUserIdByLogin(ctx context.Context, login string) (ResultDB, error)
+	GetSenderReceiverIdByLogin(ctx context.Context, senderLogin string, receiverLogin string) (ResultDB, error)
+	CreatePackage(
+		ctx context.Context,
+		weight int,
+		packageType int,
+		senderId uint64,
+		receiverId uint64,
+		departmentReceiver uint64,
+		createDate string,
+		deliverDate string) (uint64, error)
+	AddPackageToStorehouse(
+		ctx context.Context,
+		departmentId uint64,
+		packageId uint64,
+		isImport bool) error
 }
 
 type PostgresDB struct {

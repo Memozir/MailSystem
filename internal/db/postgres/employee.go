@@ -14,3 +14,18 @@ func (db *PostgresDB) CreateEmployee(
 
 	return ResultDB{Err: err, Val: employeeId}
 }
+
+func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) (uint64, error) {
+	query := `
+		SELECT e.id
+		FROM employee e
+		INNER JOIN "user" u
+			ON e."user" = u.id
+		WHERE u.login = $1;
+	`
+
+	var employeeId uint64
+	err := db.connPool.QueryRow(ctx, query, login).Scan(&employeeId)
+
+	return employeeId, err
+}
