@@ -15,6 +15,7 @@ const (
 )
 
 // Package statuses
+/*
 const (
 	PACKAGE_STATUS_CREATED          = 0
 	PACKAGE_STATUS_DELIVERY         = 1
@@ -27,3 +28,4 @@ const (
 	PACKAGE_TYPE_BOX    = 1
 	PACKAGE_TYPE_CARD   = 2
 )
+*/
