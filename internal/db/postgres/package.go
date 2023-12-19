@@ -21,9 +21,11 @@ func (db *PostgresDB) ProducePaymentInfo(ctx context.Context, packageId uint64, 
 		return err
 	}
 	tariff, err = pgx.CollectOneRow(row, pgx.RowToStructByName[Tariff])
+	if err != nil {
+		return err
+	}
 
 	err = db.SetPackagePaymentInfo(ctx, packageId, tariff.Id)
-
 	if err != nil {
 		return err
 	}
