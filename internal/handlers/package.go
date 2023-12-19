@@ -105,9 +105,10 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 
 								if err != nil {
 									log.Printf("ADD PACKAGE TO STOREHOUSE ERROR: %s", err.Error())
-									rw.WriteHeader(http.StatusCreated)
+									rw.WriteHeader(http.StatusBadRequest)
 								} else {
 									log.Println("PACKAGE WAS CREATED")
+									rw.WriteHeader(http.StatusCreated)
 								}
 							}
 						}
