@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"mail_system/internal/config"
+	"mail_system/internal/model"
 )
 
 func (db *PostgresDB) CreateEmployee(
@@ -23,19 +24,19 @@ func (db *PostgresDB) CreateEmployee(
 	return ResultDB{Err: err, Val: employeeId}
 }
 
-func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) (uint64, error) {
+func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) ResultDB {
 	query := `
-		SELECT e.id
+		SELECT e.id, e."user", e."role", e.department
 		FROM employee e
 		INNER JOIN "user" u
 			ON e."user" = u.id
 		WHERE u.login = $1;
 	`
 
-	var employeeId uint64
-	err := db.connPool.QueryRow(ctx, query, login).Scan(&employeeId)
+	var employee model.Employee
+	err := db.connPool.QueryRow(ctx, query, login).Scan(&employee)
 
-	return employeeId, err
+	return ResultDB{Val: employee, Err: err}
 }
 
 func (db *PostgresDB) GetEmployeeDepartment(ctx context.Context, login string) ResultDB {
