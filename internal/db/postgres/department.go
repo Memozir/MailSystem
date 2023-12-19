@@ -31,8 +31,14 @@ func (db *PostgresDB) AddPackageToStorehouse(
 
 	if isImport {
 		_, err = db.connPool.Query(ctx, query, departmentId, packageId, true, false)
+		if err != nil {
+			return err
+		}
 	} else {
 		_, err = db.connPool.Query(ctx, query, departmentId, packageId, false, true)
+		if err != nil {
+			return err
+		}
 	}
 
 	return err
