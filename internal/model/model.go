@@ -28,3 +28,10 @@ type UserAuth struct {
 	ClientId uint64 `db:"client_id"`
 	RoleCode int8   `db:"role_code"`
 }
+
+type Employee struct {
+	EmployeeId   uint64 `db:"id"`
+	UserId       uint64 `db:"user"`
+	RoleCode     int8   `db:"role"`
+	DepartmentId uint64 `db:"department"`
+}

@@ -127,3 +127,15 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 		rw.WriteHeader(http.StatusBadRequest)
 	}
 }
+
+/*
+func (handler *MailHandlers) Test1(rw http.ResponseWriter, r *http.Request) {
+	_, err := handler.Db.GetSenderReceiverIdByLogin(r.Context(), "qw3rt", "1")
+
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		log.Println("SUCCESS")
+	}
+}
+*/
