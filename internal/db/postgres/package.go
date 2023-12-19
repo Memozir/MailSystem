@@ -69,7 +69,7 @@ func (db *PostgresDB) CreatePackage(
 		                    "type",
 		                    create_date,
 		                    deliver_date)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
 	`
 
 	var packageId uint64
