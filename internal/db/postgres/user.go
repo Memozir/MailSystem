@@ -56,14 +56,14 @@ func (db *PostgresDB) GetSenderReceiverIdByLogin(ctx context.Context, senderLogi
 	query := `
 		SELECT
 		(
-			SELECT id
+			SELECT c1.id
 			FROM client as c1
 			INNER JOIN "user" u1
 				ON c1."user" = u1.id
 			WHERE c1.login = $1
 		) sender,
 		(
-			SELECT id
+			SELECT c2.id
 			FROM client as c2
 			INNER JOIN "user" u2
 				ON c2."user" = u2.id
