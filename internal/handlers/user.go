@@ -103,7 +103,7 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 	} else if res.Val.(model.UserAuth).ClientId > 0 {
 		log.Println("SUCCESS CLIENT AUTH")
 
-		response := UserAuthResponse{Role: config.USER_ROLE}
+		response := UserAuthResponse{Role: config.UserRole}
 		err = json.NewEncoder(rw).Encode(&response)
 
 		if err != nil {

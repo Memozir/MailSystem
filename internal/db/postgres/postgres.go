@@ -26,7 +26,8 @@ type Storage interface {
 		login string,
 		pass string,
 		birth string) ResultDB
-	CreateEmployee(ctx context.Context, userId uint8, roleId uint8) ResultDB
+	CreateEmployee(
+		ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) ResultDB
 	CreateRole(ctx context.Context, code uint8, name string) ResultDB
 	CreateAddress(ctx context.Context, name string) error
 	GetAddressByName(ctx context.Context, addressName string, apartment string) (uint8, error)
@@ -36,6 +37,7 @@ type Storage interface {
 	AddPackageToClient(ctx context.Context, clientId uint64, packageId uint64) error
 	GetDepartmentByReceiver(ctx context.Context, receiverId uint64) (uint64, error)
 	GetEmployeeByLogin(ctx context.Context, login string) (uint64, error)
+	GetEmployeeDepartment(ctx context.Context, login string) ResultDB
 	ProducePaymentInfo(ctx context.Context, packageId uint64, packageType int, weight int) error
 	AddEmployeeToPackageResponsibleList(ctx context.Context, employeeId uint64, packageId uint64) error
 	GetUserIdByLogin(ctx context.Context, login string) (ResultDB, error)
