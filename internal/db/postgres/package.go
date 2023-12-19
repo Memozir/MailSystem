@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/jackc/pgx/v5"
 )
 
 type Tariff struct {
@@ -15,11 +16,11 @@ func (db *PostgresDB) ProducePaymentInfo(ctx context.Context, packageId uint64, 
 	`
 
 	var tariff Tariff
-	err := db.connPool.QueryRow(ctx, query, packageType, weight).Scan(&tariff)
-
+	row, err := db.connPool.Query(ctx, query, packageType, weight)
 	if err != nil {
 		return err
 	}
+	tariff, err = pgx.CollectOneRow(row, pgx.RowToStructByName[Tariff])
 
 	err = db.SetPackagePaymentInfo(ctx, packageId, tariff.Id)
 
