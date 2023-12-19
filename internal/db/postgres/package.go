@@ -7,7 +7,7 @@ import (
 
 type Tariff struct {
 	Id    uint64 `db:"id"`
-	Price uint8  `db:"id"`
+	Price uint8  `db:"price"`
 }
 
 func (db *PostgresDB) ProducePaymentInfo(ctx context.Context, packageId uint64, packageType int, weight int) error {
