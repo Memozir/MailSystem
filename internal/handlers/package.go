@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	db "mail_system/internal/db/postgres"
+	"mail_system/internal/model"
 	"net/http"
 	"time"
 )
@@ -40,8 +41,8 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 				log.Printf("CREATE PACKAGE GET DEPARTMENT BY RECEIVER ERROR: %s", err.Error())
 				rw.WriteHeader(http.StatusBadRequest)
 			} else {
-				createData := time.Now()
-				deliverDate := createData.AddDate(0, 0, 3).Format("2006-11-01")
+				createDate := time.Now()
+				deliverDate := createDate.AddDate(0, 0, 3).Format("2006-01-02")
 
 				packageId, err := handler.Db.CreatePackage(
 					r.Context(),
@@ -50,7 +51,7 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 					senderReceiver.Val.(db.SenderReceiverRes).Sender,
 					senderReceiver.Val.(db.SenderReceiverRes).Receiver,
 					departmentReceiver,
-					createData.Format("2006-11-01"),
+					createDate.Format("2006-01-02"),
 					deliverDate,
 				)
 
@@ -76,18 +77,18 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 								packageId,
 							)
 						*/
-						workerId, err := handler.Db.GetEmployeeByLogin(
+						worker := handler.Db.GetEmployeeByLogin(
 							r.Context(),
 							packageCreate.WorkerLogin,
 						)
 
-						if err != nil {
+						if worker.Err != nil {
 							log.Printf("GET EMPLOYEE BY LOGIN (CREATE PACKAGE) ERROR: %s", err.Error())
 							rw.WriteHeader(http.StatusBadRequest)
 						} else {
 							err = handler.Db.AddEmployeeToPackageResponsibleList(
 								r.Context(),
-								workerId,
+								worker.Val.(model.Employee).EmployeeId,
 								packageId,
 							)
 
