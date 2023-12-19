@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"log"
 	"mail_system/internal/model"
 )
@@ -72,8 +73,11 @@ func (db *PostgresDB) GetSenderReceiverIdByLogin(ctx context.Context, senderLogi
 		`
 
 	var senderReceiver SenderReceiverRes
-	err := db.connPool.QueryRow(ctx, query, senderLogin, receiverLogin).Scan(&senderReceiver)
-
+	row, err := db.connPool.Query(ctx, query, senderLogin, receiverLogin)
+	if err != nil {
+		return ResultDB{}, err
+	}
+	senderReceiver, err = pgx.CollectOneRow(row, pgx.RowToStructByName[SenderReceiverRes])
 	if err != nil {
 		return ResultDB{}, err
 	}
