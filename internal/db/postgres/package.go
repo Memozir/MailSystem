@@ -109,7 +109,7 @@ func (db *PostgresDB) CreatePackage(
 func (db *PostgresDB) GetEmployeePackages(ctx context.Context, employeeId uint64) ([]model.Package, error) {
 	query := `
 		SELECT 
-		    p.id,
+		    DISTINCT p.id,
 		    p.status,
 		    p.weight,
 		    u_rec.login as receiver,
