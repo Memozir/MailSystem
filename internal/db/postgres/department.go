@@ -44,7 +44,7 @@ func (db *PostgresDB) AddPackageToStorehouse(
 
 func (db *PostgresDB) GetAllDepartments(ctx context.Context) ([]model.Department, error) {
 	query := `
-		SELECT d.id, a.name
+		SELECT d.id index, a.name
 		FROM department d
 		INNER JOIN address a ON  a.department = d.id;
 	`
@@ -57,11 +57,16 @@ func (db *PostgresDB) GetAllDepartments(ctx context.Context) ([]model.Department
 
 func (db *PostgresDB) GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error) {
 	query := `
-		SELECT d.id, a.name
-		FROM department d
-		INNER JOIN address a ON  a.department = d.id
-		INNER JOIN client c ON c.address = a.id
-		WHERE c.id = $1;
+		SELECT d.id index, a.name
+		FROM department d 
+		INNER JOIN address a on d.id = a.department
+		WHERE d.id = (
+		    SELECT d.id
+		    FROM client c 
+		    INNER JOIN address a ON c.address = a.id
+		    INNER JOIN department d ON a.department = d.id
+		    WHERE c.id = $1
+		);
 	`
 
 	rows, err := db.connPool.Query(ctx, query, clientId)
