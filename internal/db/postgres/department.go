@@ -1,6 +1,10 @@
 package db
 
-import "context"
+import (
+	"context"
+	"github.com/jackc/pgx/v5"
+	"mail_system/internal/model"
+)
 
 func (db *PostgresDB) GetDepartmentByReceiver(ctx context.Context, receiverId uint64) (uint64, error) {
 	query := `
@@ -36,4 +40,32 @@ func (db *PostgresDB) AddPackageToStorehouse(
 	}
 
 	return err
+}
+
+func (db *PostgresDB) GetAllDepartments(ctx context.Context) ([]model.Department, error) {
+	query := `
+		SELECT d.id, a.name
+		FROM department d
+		INNER JOIN address a ON  a.department = d.id;
+	`
+
+	rows, err := db.connPool.Query(ctx, query)
+	departments, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Department])
+
+	return departments, err
+}
+
+func (db *PostgresDB) GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error) {
+	query := `
+		SELECT d.id, a.name
+		FROM department d
+		INNER JOIN address a ON  a.department = d.id
+		INNER JOIN client c ON c.address = a.id
+		WHERE c.id = $1;
+	`
+
+	rows, err := db.connPool.Query(ctx, query, clientId)
+	departments, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Department])
+
+	return departments, err
 }

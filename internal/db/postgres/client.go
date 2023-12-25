@@ -26,3 +26,18 @@ func (db *PostgresDB) AddPackageToClient(ctx context.Context, clientId uint64, p
 
 	return err
 }
+
+func (db *PostgresDB) GetClientByLogin(ctx context.Context, login string) (uint64, error) {
+	query := `
+		SELECT c.id
+		FROM client c
+		INNER JOIN "user" u
+			ON c."user" = u.id
+		WHERE u.login = $1;
+	`
+
+	var clientId uint64
+	err := db.connPool.QueryRow(ctx, query, login).Scan(&clientId)
+
+	return clientId, err
+}

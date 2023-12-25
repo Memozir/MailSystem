@@ -62,3 +62,8 @@ type Package struct {
 	Address        string `db:"sender_address" json:"address"`
 	Type           int    `db:"type" json:"type"`
 }
+
+type Department struct {
+	Index   uint64 `db:"id" json:"index"`
+	Address string `db:"address" json:"address"`
+}

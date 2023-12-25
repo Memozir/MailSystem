@@ -61,6 +61,9 @@ type Storage interface {
 	GetEmployeePackages(ctx context.Context, employeeId uint64) ([]model.Package, error)
 	GetEmployeeDepartmentByRole(ctx context.Context, departmentId uint64, role int) (uint64, error)
 	BeginTran(ctx context.Context) (pgx.Tx, error)
+	GetAllDepartments(ctx context.Context) ([]model.Department, error)
+	GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error)
+	GetClientByLogin(ctx context.Context, login string) (uint64, error)
 }
 
 type PostgresDB struct {
