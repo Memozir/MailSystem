@@ -192,8 +192,8 @@ func (handler *MailHandlers) GetEmployeePackages(rw http.ResponseWriter, r *http
 		log.Printf("GET EMPLOYEE ERROR: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
-		res, err := handler.Db.GetEmployeePackages(r.Context(), 17)
-		//res, err := handler.Db.GetEmployeePackages(r.Context(), 1, int(employee.Val.(model.Employee).RoleCode))
+		//res, err := handler.Db.GetEmployeePackages(r.Context(), 17)
+		res, err := handler.Db.GetEmployeePackages(r.Context(), employee.Val.(model.Employee).EmployeeId)
 
 		if err != nil {
 			log.Printf("GET EMPLOYEE PACKAGES ERROR: %s", err.Error())

@@ -8,25 +8,25 @@ import (
 	"time"
 )
 
-type AddresJson struct {
+type AddressRequest struct {
 	Name string `json:"name"`
 }
 
 func (handler *MailHandlers) CreateAddressHandler(rw http.ResponseWriter, r *http.Request) {
 	log.Println("Address registration handler")
 
-	var addresJson AddresJson
-	err := json.NewDecoder(r.Body).Decode(&addresJson)
+	var request AddressRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
 
 	if err != nil {
 		log.Printf("Address decode error: %s", err)
 	}
 
-	log.Println(addresJson)
+	log.Println(request)
 	contextCreateAddress, cancelCreateAddress := context.WithTimeout(r.Context(), time.Second*2)
 	defer cancelCreateAddress()
 
-	err = handler.Db.CreateAddress(contextCreateAddress, addresJson.Name)
+	err = handler.Db.CreateAddress(contextCreateAddress, request.Name)
 
 	if err != nil {
 		log.Printf("Address was not created: %s", err.Error())
