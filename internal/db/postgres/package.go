@@ -132,7 +132,7 @@ func (db *PostgresDB) GetEmployeePackages(ctx context.Context, employeeId uint64
 		INNER JOIN client send ON p.sender = send.id
 		INNER JOIN address addr ON addr.id = rec.address
 		INNER JOIN "user" u_rec ON rec."user" = u_rec.id
-		INNER JOIN "user" u_send ON rec."user" = u_send.id
+		INNER JOIN "user" u_send ON send."user" = u_send.id
 		INNER JOIN payment_info pi ON pi.package = p.id
 		INNER JOIN tarrif as t ON pi.tarrif = t.id
 		WHERE ep.employee = $1
