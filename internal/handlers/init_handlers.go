@@ -47,6 +47,7 @@ func (handler *MailHandlers) LoadHandlers() *mux.Router {
 	router.HandleFunc("/get/packages", handler.GetEmployeePackages).Methods("GET")
 	router.HandleFunc("/get/departments", handler.GetAllDepartments).Methods("GET")
 	router.HandleFunc("/get/client/departments", handler.GetClientDepartments).Methods("GET")
+	router.HandleFunc("/get/employee/departments", handler.GetEmployeeDepartments).Methods("GET")
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 

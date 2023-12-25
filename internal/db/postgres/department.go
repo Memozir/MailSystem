@@ -74,3 +74,17 @@ func (db *PostgresDB) GetClientDepartments(ctx context.Context, clientId uint64)
 
 	return departments, err
 }
+func (db *PostgresDB) GetEmployeeDepartments(ctx context.Context, employeeId uint64) ([]model.Department, error) {
+	query := `
+		SELECT d.id index, a.name
+		FROM department d 
+		INNER JOIN address a on d.id = a.department
+		INNER JOIN employee e on d.id = e.department
+		WHERE d.id = e.department AND e.id = $1
+	`
+
+	rows, err := db.connPool.Query(ctx, query, employeeId)
+	departments, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Department])
+
+	return departments, err
+}

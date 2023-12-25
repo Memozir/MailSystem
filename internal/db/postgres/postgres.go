@@ -63,6 +63,7 @@ type Storage interface {
 	BeginTran(ctx context.Context) (pgx.Tx, error)
 	GetAllDepartments(ctx context.Context) ([]model.Department, error)
 	GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error)
+	GetEmployeeDepartments(ctx context.Context, employeeId uint64) ([]model.Department, error)
 	GetClientByLogin(ctx context.Context, login string) (uint64, error)
 	//ChangePackageStatus(ctx context.Context, packageID uint64, status int8) error
 }
