@@ -13,6 +13,7 @@ type ConfigDb struct {
 const (
 	UserRole    int8  = 0
 	CourierRole uint8 = 1
+	AdminRole   int   = 3
 )
 
 // Package statuses

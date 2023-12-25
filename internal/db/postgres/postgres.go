@@ -3,7 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"log"
+	"mail_system/internal/model"
 	"os"
 
 	pgxPool "github.com/jackc/pgx/v5/pgxpool"
@@ -56,6 +58,9 @@ type Storage interface {
 		departmentId uint64,
 		packageId uint64,
 		isImport bool) error
+	GetEmployeePackages(ctx context.Context, employeeId uint64) ([]model.Package, error)
+	GetEmployeeDepartmentByRole(ctx context.Context, departmentId uint64, role int) (uint64, error)
+	BeginTran(ctx context.Context) (pgx.Tx, error)
 }
 
 type PostgresDB struct {
@@ -103,4 +108,13 @@ func NewDb(ctx context.Context) (db *PostgresDB) {
 
 	log.Printf("Connection to database on %s was Success", db.cfg.Host)
 	return db
+}
+
+func (db *PostgresDB) BeginTran(ctx context.Context) (pgx.Tx, error) {
+	res, err := db.connPool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, err
 }

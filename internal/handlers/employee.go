@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	db "mail_system/internal/db/postgres"
+	"mail_system/internal/model"
 	"net/http"
 	"time"
 )
@@ -38,7 +39,7 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 
 	userCh := make(chan db.ResultDB)
 	roleCh := make(chan db.ResultDB)
-	creatorDepartmentCh := make(chan db.ResultDB)
+	creatorEmployeeCh := make(chan db.ResultDB)
 
 	go func() {
 		userCh <- handler.Db.CreateUser(
@@ -57,22 +58,21 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 	}()
 
 	go func() {
-		creatorDepartmentCh <- handler.Db.GetEmployeeDepartment(r.Context(), emp.CreatorLogin)
+		creatorEmployeeCh <- handler.Db.GetEmployeeByLogin(r.Context(), emp.CreatorLogin)
 	}()
 
 	var user db.ResultDB
 	var role db.ResultDB
-	var departmentId db.ResultDB
+	var creatorEmployee db.ResultDB
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 2; i++ {
 		select {
 		case user = <-userCh:
 			continue
 		case role = <-roleCh:
 			continue
-		case departmentId = <-creatorDepartmentCh:
+		case creatorEmployee = <-creatorEmployeeCh:
 			continue
-
 		}
 	}
 
@@ -82,7 +82,7 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 	employeeCreateResult := handler.Db.CreateEmployee(
 		contextCreateEmployee,
 		user.Val.(uint8),
-		departmentId.Val.(uint64),
+		creatorEmployee.Val.(model.Employee).DepartmentId,
 		role.Val.(uint8))
 
 	if employeeCreateResult.Err != nil {

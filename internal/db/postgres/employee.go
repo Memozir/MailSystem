@@ -60,3 +60,17 @@ func (db *PostgresDB) GetEmployeeDepartment(ctx context.Context, login string) R
 
 	return ResultDB{Val: departmentId, Err: err}
 }
+
+func (db *PostgresDB) GetEmployeeDepartmentByRole(ctx context.Context, departmentId uint64, role int) (uint64, error) {
+	query := `
+		SELECT e.id
+		FROM employee e
+		INNER JOIN role r ON e.role = r.code
+		WHERE e.department = $1 and r.code = $2 
+	`
+
+	var employeeId uint64
+	err := db.connPool.QueryRow(ctx, query, departmentId, role).Scan(&employeeId)
+
+	return employeeId, err
+}

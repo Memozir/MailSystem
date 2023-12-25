@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"github.com/jackc/pgx/v5"
+	"log"
+	"mail_system/internal/model"
 )
 
 type Tariff struct {
@@ -89,4 +91,60 @@ func (db *PostgresDB) CreatePackage(
 	).Scan(&packageId)
 
 	return packageId, err
+}
+
+/*
+	Id             uint64 `db:"id"`
+	Status         int    `db:"status"`
+	Weight         int    `db:"weight"`
+	Sender         uint64 `db:"sender"`
+	Receiver       uint64 `db:"receiver"`
+	Courier        uint64 `db:"courier"`
+	DateOfCreation string `db:"create_date"`
+	DateOfReceipt  string `db:"deliver_date"`
+	NumDepartment  uint64 `db:"department_receiver"`
+	Address        uint64 `db:"address"
+*/
+
+func (db *PostgresDB) GetEmployeePackages(ctx context.Context, employeeId uint64) ([]model.Package, error) {
+	query := `
+		SELECT 
+		    p.id,
+		    p.status,
+		    p.weight,
+		    u_rec.login as receiver,
+		    u_send.login as sender,
+		    CAST(p.create_date AS TEXT),
+		 	CAST(p.deliver_date AS TEXT),
+		    p.department_receiver,
+		    CONCAT_WS(' ', addr.name, addr.apartment) sender_address,
+		    COALESCE(
+		    	(
+		    	SELECT id
+		    	FROM employee_package as emp
+		    	INNER JOIN employee as cur_emp ON emp.employee = cur_emp.id
+		    	WHERE cur_emp.role = 1 and emp.package = p.id),
+		    	0) as courier,
+		    t.type
+		FROM employee_package as ep
+		INNER JOIN package as p ON ep.package = p.id
+		INNER JOIN client rec ON p.receiver = rec.id
+		INNER JOIN client send ON p.receiver = send.id
+		INNER JOIN address addr ON addr.id = rec.address
+		INNER JOIN "user" u_rec ON rec."user" = u_rec.id
+		INNER JOIN "user" u_send ON rec."user" = u_send.id
+		INNER JOIN payment_info pi ON pi.package = p.id
+		INNER JOIN tarrif as t ON pi.tarrif = t.id
+		WHERE ep.employee = $1
+	`
+
+	rows, err := db.connPool.Query(ctx, query, employeeId)
+
+	if err != nil {
+		log.Printf("ERRRRR %s: ", err.Error())
+	}
+
+	packages, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Package])
+
+	return packages, err
 }
