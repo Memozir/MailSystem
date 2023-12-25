@@ -82,76 +82,81 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 							log.Printf("PRODUCE PAYMENT INFO ERROR: %s", err.Error())
 							rw.WriteHeader(http.StatusBadRequest)
 						} else {
-							/*
-								err = handler.Db.AddPackageToClient(
-									r.Context(),
-									senderReceiver.Val.(db.SenderReceiverRes).Sender,
-									packageId,
-								)
-							*/
-							worker := handler.Db.GetEmployeeByLogin(
+
+							err = handler.Db.AddPackageToClient(
 								r.Context(),
-								packageCreate.WorkerLogin,
+								senderReceiver.Val.(db.SenderReceiverRes).Sender,
+								packageId,
 							)
 
-							if worker.Err != nil {
-								log.Printf("GET EMPLOYEE BY LOGIN (CREATE PACKAGE) ERROR: %s", err.Error())
+							if err != nil {
+								log.Printf("ADD PACKAGE TO CLIENT ERROR: %s", err.Error())
 								rw.WriteHeader(http.StatusBadRequest)
 							} else {
-								err = handler.Db.AddEmployeeToPackageResponsibleList(
+								worker := handler.Db.GetEmployeeByLogin(
 									r.Context(),
-									worker.Val.(model.Employee).EmployeeId,
-									packageId,
+									packageCreate.WorkerLogin,
 								)
 
-								if err != nil {
-									log.Printf("ADD EMPLOYEE TO RESPONSIBLE LIST ERROR: %s", err.Error())
+								if worker.Err != nil {
+									log.Printf("GET EMPLOYEE BY LOGIN (CREATE PACKAGE) ERROR: %s", err.Error())
 									rw.WriteHeader(http.StatusBadRequest)
 								} else {
-									currentDepartmentId := handler.Db.GetEmployeeDepartment(r.Context(),
-										packageCreate.WorkerLogin)
+									err = handler.Db.AddEmployeeToPackageResponsibleList(
+										r.Context(),
+										worker.Val.(model.Employee).EmployeeId,
+										packageId,
+									)
 
-									if currentDepartmentId.Err != nil {
-										log.Printf("GET CURRENT DEPARTMENT ERROR: %s", err.Error())
+									if err != nil {
+										log.Printf("ADD EMPLOYEE TO RESPONSIBLE LIST ERROR: %s", err.Error())
 										rw.WriteHeader(http.StatusBadRequest)
 									} else {
-										adminId, err := handler.Db.GetEmployeeDepartmentByRole(r.Context(),
-											currentDepartmentId.Val.(uint64), config.AdminRole)
+										currentDepartmentId := handler.Db.GetEmployeeDepartment(r.Context(),
+											packageCreate.WorkerLogin)
 
-										if err != nil {
-											log.Printf("GET ADMIN OF CURRENT DEPARTMENT ERROR: %s", err.Error())
+										if currentDepartmentId.Err != nil {
+											log.Printf("GET CURRENT DEPARTMENT ERROR: %s", err.Error())
 											rw.WriteHeader(http.StatusBadRequest)
 										} else {
-
-											err = handler.Db.AddEmployeeToPackageResponsibleList(
-												r.Context(),
-												adminId,
-												packageId,
-											)
+											adminId, err := handler.Db.GetEmployeeDepartmentByRole(r.Context(),
+												currentDepartmentId.Val.(uint64), config.AdminRole)
 
 											if err != nil {
-												log.Printf("ADD ADMIN TO RESPONSIBLE LIST ERROR: %s", err.Error())
+												log.Printf("GET ADMIN OF CURRENT DEPARTMENT ERROR: %s", err.Error())
 												rw.WriteHeader(http.StatusBadRequest)
 											} else {
-												err = handler.Db.AddPackageToStorehouse(
+
+												err = handler.Db.AddEmployeeToPackageResponsibleList(
 													r.Context(),
-													departmentReceiver,
+													adminId,
 													packageId,
-													false,
 												)
 
 												if err != nil {
-													log.Printf("ADD PACKAGE TO STOREHOUSE ERROR: %s", err.Error())
+													log.Printf("ADD ADMIN TO RESPONSIBLE LIST ERROR: %s", err.Error())
 													rw.WriteHeader(http.StatusBadRequest)
 												} else {
-													log.Println("PACKAGE WAS CREATED")
-													err = tran.Commit(r.Context())
+													err = handler.Db.AddPackageToStorehouse(
+														r.Context(),
+														departmentReceiver,
+														packageId,
+														false,
+													)
 
 													if err != nil {
-														log.Printf("COMMIT TRANSACTION ERROR: %s", err.Error())
+														log.Printf("ADD PACKAGE TO STOREHOUSE ERROR: %s", err.Error())
 														rw.WriteHeader(http.StatusBadRequest)
 													} else {
-														rw.WriteHeader(http.StatusCreated)
+														log.Println("PACKAGE WAS CREATED")
+														err = tran.Commit(r.Context())
+
+														if err != nil {
+															log.Printf("COMMIT TRANSACTION ERROR: %s", err.Error())
+															rw.WriteHeader(http.StatusBadRequest)
+														} else {
+															rw.WriteHeader(http.StatusCreated)
+														}
 													}
 												}
 											}
