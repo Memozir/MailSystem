@@ -64,6 +64,6 @@ type Package struct {
 }
 
 type Department struct {
-	Index   uint64 `db:"id" json:"index"`
-	Address string `db:"address" json:"address"`
+	Index   uint64 `db:"index" json:"index"`
+	Address string `db:"name" json:"address"`
 }

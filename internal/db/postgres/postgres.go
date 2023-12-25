@@ -64,6 +64,7 @@ type Storage interface {
 	GetAllDepartments(ctx context.Context) ([]model.Department, error)
 	GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error)
 	GetClientByLogin(ctx context.Context, login string) (uint64, error)
+	//ChangePackageStatus(ctx context.Context, packageID uint64, status int8) error
 }
 
 type PostgresDB struct {
