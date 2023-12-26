@@ -26,40 +26,47 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 	if err != nil {
 		log.Printf("Registration employee error: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
-		r.Context().Done()
 	} else {
-		user := handler.Db.CreateUser(
-			r.Context(),
-			emp.User.FirstName,
-			emp.User.SecondName,
-			emp.User.Login,
-			emp.User.Pass,
-			emp.User.MiddleName,
-			emp.User.BirthDate)
-		if user.Err != nil {
-			log.Printf("CREATE USER ERROR: %s", user.Err.Error())
+		tx, err := handler.Db.BeginTran(r.Context())
+		defer tx.Rollback(r.Context())
+
+		if err != nil {
+			log.Printf("BEGIN TRANSACTION ERROR: %s", err)
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			role := handler.Db.GetRoleByName(r.Context(), emp.Role.Name)
-			if role.Err != nil {
-				log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
+			user := handler.Db.CreateUser(
+				r.Context(),
+				emp.User.FirstName,
+				emp.User.SecondName,
+				emp.User.MiddleName,
+				emp.User.Login,
+				emp.User.Pass,
+				emp.User.BirthDate)
+			if user.Err != nil {
+				log.Printf("CREATE USER ERROR: %s", user.Err.Error())
 				rw.WriteHeader(http.StatusBadRequest)
 			} else {
-				creatorEmployee := handler.Db.GetEmployeeByLogin(r.Context(), emp.CreatorLogin)
-				if creatorEmployee.Err != nil {
+				role := handler.Db.GetRoleByName(r.Context(), emp.Role.Name)
+				if role.Err != nil {
 					log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
 					rw.WriteHeader(http.StatusBadRequest)
 				} else {
-					employeeCreateResult := handler.Db.CreateEmployee(
-						r.Context(),
-						user.Val.(uint8),
-						creatorEmployee.Val.(model.Employee).DepartmentId,
-						role.Val.(uint8))
-					if employeeCreateResult.Err != nil {
-						log.Printf("CREATE EMPLOYEE ERROR: %s", user.Err.Error())
+					creatorEmployee := handler.Db.GetEmployeeByLogin(r.Context(), emp.CreatorLogin)
+					if creatorEmployee.Err != nil {
+						log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
 						rw.WriteHeader(http.StatusBadRequest)
 					} else {
-						rw.WriteHeader(http.StatusCreated)
+						employeeCreateResult := handler.Db.CreateEmployee(
+							r.Context(),
+							user.Val.(uint8),
+							creatorEmployee.Val.(model.Employee).DepartmentId,
+							role.Val.(uint8))
+						if employeeCreateResult.Err != nil {
+							log.Printf("CREATE EMPLOYEE ERROR: %s", user.Err.Error())
+							rw.WriteHeader(http.StatusBadRequest)
+						} else {
+							rw.WriteHeader(http.StatusCreated)
+						}
 					}
 				}
 			}
