@@ -145,3 +145,41 @@ func (handler *MailHandlers) DeleteAddressByAdmin(rw http.ResponseWriter, r *htt
 		}
 	}
 }
+
+type DeleteEmployeeRequest struct {
+	User          UserAuthRequest `json:"user"`
+	EmployeeLogin string          `json:"employee_login"`
+}
+
+func (handler *MailHandlers) DeleteEmployee(rw http.ResponseWriter, r *http.Request) {
+	var request DeleteEmployeeRequest
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		log.Printf("DELETE EMPLOYEE DECODE ERROR: %s", err)
+		rw.WriteHeader(http.StatusBadRequest)
+	} else {
+		employeeDelete := handler.Db.GetEmployeeByLogin(r.Context(), request.EmployeeLogin)
+		if employeeDelete.Err != nil {
+			log.Printf("GET EMPLOYEE ID ERROR: %s", err)
+			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			admin := handler.Db.GetEmployeeByLogin(r.Context(), request.EmployeeLogin)
+			if admin.Err != nil {
+				log.Printf("GET ADMIN ID ERROR: %s", err)
+				rw.WriteHeader(http.StatusBadRequest)
+			} else {
+				if employeeDelete.Val.(model.Employee).DepartmentId == admin.Val.(model.Employee).DepartmentId {
+					err = handler.Db.DeleteEmployee(r.Context(), employeeDelete.Val.(model.Employee).EmployeeId)
+					if err != nil {
+						log.Printf("DELETE EMPLOYEE ERROR: %s", err)
+						rw.WriteHeader(http.StatusBadRequest)
+					} else {
+						log.Printf("DELETE EMPLOYEE SUCCESS: %s", err)
+						rw.WriteHeader(http.StatusOK)
+					}
+				}
+			}
+		}
+	}
+}
