@@ -1,15 +1,12 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"mail_system/internal/config"
-	db "mail_system/internal/db/postgres"
 	"mail_system/internal/model"
 	"net/http"
-	"time"
 )
 
 type EmployeeJSON struct {
@@ -30,68 +27,107 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 		log.Printf("Registration employee error: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 		r.Context().Done()
-	}
-
-	contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
-	defer cancelCreateUser()
-
-	contextGetRole, cancelGetRole := context.WithTimeout(r.Context(), time.Second*2)
-	defer cancelGetRole()
-
-	userCh := make(chan db.ResultDB)
-	roleCh := make(chan db.ResultDB)
-	creatorEmployeeCh := make(chan db.ResultDB)
-
-	go func() {
-		userCh <- handler.Db.CreateUser(
-			contextCreateUser,
-			cancelCreateUser,
+	} else {
+		user := handler.Db.CreateUser(
+			r.Context(),
 			emp.User.FirstName,
 			emp.User.SecondName,
 			emp.User.Login,
 			emp.User.Pass,
 			emp.User.MiddleName,
 			emp.User.BirthDate)
-	}()
-
-	go func() {
-		roleCh <- handler.Db.GetRoleByName(contextGetRole, cancelGetRole, emp.Role.Name)
-	}()
-
-	go func() {
-		creatorEmployeeCh <- handler.Db.GetEmployeeByLogin(r.Context(), emp.CreatorLogin)
-	}()
-
-	var user db.ResultDB
-	var role db.ResultDB
-	var creatorEmployee db.ResultDB
-
-	for i := 0; i < 2; i++ {
-		select {
-		case user = <-userCh:
-			continue
-		case role = <-roleCh:
-			continue
-		case creatorEmployee = <-creatorEmployeeCh:
-			continue
+		if user.Err != nil {
+			log.Printf("CREATE USER ERROR: %s", user.Err.Error())
+			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			role := handler.Db.GetRoleByName(r.Context(), emp.Role.Name)
+			if role.Err != nil {
+				log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
+				rw.WriteHeader(http.StatusBadRequest)
+			} else {
+				creatorEmployee := handler.Db.GetEmployeeByLogin(r.Context(), emp.CreatorLogin)
+				if creatorEmployee.Err != nil {
+					log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
+					rw.WriteHeader(http.StatusBadRequest)
+				} else {
+					employeeCreateResult := handler.Db.CreateEmployee(
+						r.Context(),
+						user.Val.(uint8),
+						creatorEmployee.Val.(model.Employee).DepartmentId,
+						role.Val.(uint8))
+					if employeeCreateResult.Err != nil {
+						log.Printf("CREATE EMPLOYEE ERROR: %s", user.Err.Error())
+						rw.WriteHeader(http.StatusBadRequest)
+					} else {
+						rw.WriteHeader(http.StatusCreated)
+					}
+				}
+			}
 		}
 	}
 
-	contextCreateEmployee, cancelCreateEmployee := context.WithTimeout(r.Context(), time.Second*2)
-	defer cancelCreateEmployee()
+	//contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
+	//defer cancelCreateUser()
 
-	employeeCreateResult := handler.Db.CreateEmployee(
-		contextCreateEmployee,
-		user.Val.(uint8),
-		creatorEmployee.Val.(model.Employee).DepartmentId,
-		role.Val.(uint8))
+	//contextGetRole, cancelGetRole := context.WithTimeout(r.Context(), time.Second*2)
+	//defer cancelGetRole()
 
-	if employeeCreateResult.Err != nil {
-		rw.WriteHeader(http.StatusBadRequest)
-		r.Context().Done()
-	} else {
-		rw.WriteHeader(http.StatusCreated)
-	}
+	//userCh := make(chan db.ResultDB)
+	//roleCh := make(chan db.ResultDB)
+	//creatorEmployeeCh := make(chan db.ResultDB)
+
+	/*
+		go func() {
+			userCh <- handler.Db.CreateUser(
+				contextCreateUser,
+				cancelCreateUser,
+				emp.User.FirstName,
+				emp.User.SecondName,
+				emp.User.Login,
+				emp.User.Pass,
+				emp.User.MiddleName,
+				emp.User.BirthDate)
+		}()
+
+		go func() {
+			roleCh <- handler.Db.GetRoleByName(contextGetRole, cancelGetRole, emp.Role.Name)
+		}()
+
+		go func() {
+			creatorEmployeeCh <- handler.Db.GetEmployeeByLogin(r.Context(), emp.CreatorLogin)
+		}()
+
+		var user db.ResultDB
+		var role db.ResultDB
+		var creatorEmployee db.ResultDB
+
+		for i := 0; i < 2; i++ {
+			select {
+			case user = <-userCh:
+				continue
+			case role = <-roleCh:
+				continue
+			case creatorEmployee = <-creatorEmployeeCh:
+				continue
+			}
+		}
+
+		contextCreateEmployee, cancelCreateEmployee := context.WithTimeout(r.Context(), time.Second*2)
+		defer cancelCreateEmployee()
+
+		employeeCreateResult := handler.Db.CreateEmployee(
+			contextCreateEmployee,
+			user.Val.(uint8),
+			creatorEmployee.Val.(model.Employee).DepartmentId,
+			role.Val.(uint8))
+
+		if employeeCreateResult.Err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			r.Context().Done()
+		} else {
+			rw.WriteHeader(http.StatusCreated)
+		}
+	*/
 }
 
 type ManageAddressJSON struct {
