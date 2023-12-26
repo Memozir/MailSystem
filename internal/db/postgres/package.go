@@ -131,14 +131,14 @@ func (db *PostgresDB) GetEmployeePackages(
 		    	0) as courier,
 		    t.type
 		FROM employee_package as ep
-		INNER JOIN package as p ON ep.package = p.id
-		INNER JOIN client rec ON p.receiver = rec.id
-		INNER JOIN client send ON p.sender = send.id
-		INNER JOIN address addr ON addr.id = rec.address
-		INNER JOIN "user" u_rec ON rec."user" = u_rec.id
-		INNER JOIN "user" u_send ON send."user" = u_send.id
-		INNER JOIN payment_info pi ON pi.package = p.id
-		INNER JOIN tarrif as t ON pi.tarrif = t.id
+			INNER JOIN package as p ON ep.package = p.id
+			INNER JOIN client rec ON p.receiver = rec.id
+			INNER JOIN client send ON p.sender = send.id
+			INNER JOIN address addr ON addr.id = rec.address
+			INNER JOIN "user" u_rec ON rec."user" = u_rec.id
+			INNER JOIN "user" u_send ON send."user" = u_send.id
+			INNER JOIN payment_info pi ON pi.package = p.id
+			INNER JOIN tarrif as t ON pi.tarrif = t.id
 		WHERE ep.employee = $1
 	`
 	var queryBuilder strings.Builder
@@ -179,12 +179,12 @@ func (db *PostgresDB) GetCourierDeliverPackages(ctx context.Context, departmentI
 		    	0) as courier,
 		    p.type
 		FROM storehouse s 
-		INNER JOIN package p ON s.package = p.id
-		INNER JOIN client c on c.id = p.receiver
-		INNER JOIN client c2 on c2.id = p.sender
-		INNER JOIN "user" u_send on u_send.id = c."user"
-		INNER JOIN "user" u2_rec on u2_rec.id = c2."user"
-		INNER JOIN public.address addr on addr.id = c.address
+			INNER JOIN package p ON s.package = p.id
+			INNER JOIN client c on c.id = p.receiver
+			INNER JOIN client c2 on c2.id = p.sender
+			INNER JOIN "user" u_send on u_send.id = c."user"
+			INNER JOIN "user" u2_rec on u2_rec.id = c2."user"
+			INNER JOIN public.address addr on addr.id = c.address
 		WHERE s.department = $1 and p.status = $2
 	`
 
@@ -205,4 +205,40 @@ func (db *PostgresDB) ChangePackageStatus(ctx context.Context, packageID uint64,
 	_, err := db.connPool.Exec(ctx, query, status, packageID)
 
 	return err
+}
+
+func (db *PostgresDB) GetClientPackages(ctx context.Context, clientId uint64) ([]model.Package, error) {
+	query := `
+		SELECT
+		    p.id,
+		    p.status,
+		    p.weight,
+		    u2_rec.login as receiver,
+		    u_send.login as sender,
+		    CAST(p.create_date AS TEXT),
+		 	CAST(p.deliver_date AS TEXT),
+		    p.department_receiver,
+		    CONCAT_WS(' ', addr.name, addr.apartment) sender_address,
+		    COALESCE(
+		    	(
+		    	SELECT id
+		    	FROM employee_package as emp
+		    	INNER JOIN employee as cur_emp ON emp.employee = cur_emp.id
+		    	WHERE cur_emp.role = 1 and emp.package = p.id),
+		    	0) as courier,
+		    p.type
+		FROM package p
+			INNER JOIN client c on c.id = p.receiver
+			INNER JOIN client c2 on c2.id = p.sender
+			INNER JOIN "user" u_send on u_send.id = c."user"
+			INNER JOIN "user" u2_rec on u2_rec.id = c2."user"
+			INNER JOIN public.address addr on addr.id = c.address
+		WHERE p.sender = $1 and p.status < $2
+	`
+
+	rows, err := db.connPool.Query(ctx, query, clientId, config.PACKAGE_STATUS_RECEIVED)
+
+	packages, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Package])
+
+	return packages, err
 }

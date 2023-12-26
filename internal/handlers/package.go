@@ -172,7 +172,7 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 	}
 }
 
-type EmployeePackagesResponseJSON struct {
+type PackagesResponseJSON struct {
 	Packages []model.Package `json:"packages"`
 }
 
@@ -202,7 +202,7 @@ func (handler *MailHandlers) GetEmployeePackages(rw http.ResponseWriter, r *http
 			log.Printf("GET EMPLOYEE PACKAGES ERROR: %s", err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			response := EmployeePackagesResponseJSON{Packages: res}
+			response := PackagesResponseJSON{Packages: res}
 			err = json.NewEncoder(rw).Encode(&response)
 
 			if err != nil {
@@ -240,7 +240,7 @@ func (handler *MailHandlers) GetCourierDeliverPackages(rw http.ResponseWriter, r
 			log.Printf("GET COURIER PACKAGES ERROR: %s", err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			response := EmployeePackagesResponseJSON{Packages: res}
+			response := PackagesResponseJSON{Packages: res}
 			err = json.NewEncoder(rw).Encode(&response)
 
 			if err != nil {
@@ -294,6 +294,38 @@ func (handler *MailHandlers) ChangePackageStatus(rw http.ResponseWriter, r *http
 				}
 				log.Printf("STATUS OF PACKAGE CHANGED")
 				rw.WriteHeader(http.StatusOK)
+			}
+		}
+	}
+}
+
+func (handler *MailHandlers) GetClientPackages(rw http.ResponseWriter, r *http.Request) {
+	var request UserAuthRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+		log.Printf("DECODE ERROR: %s", err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+	} else {
+		clientId, err := handler.Db.GetClientByLogin(r.Context(), request.Login)
+		if err != nil {
+			log.Printf("GET CLIENT ERROR: %s", err.Error())
+			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			packages, err := handler.Db.GetClientPackages(r.Context(), clientId)
+			if err != nil {
+				log.Printf("GET CLIENT PACKAGES ERROR: %s", err.Error())
+				rw.WriteHeader(http.StatusBadRequest)
+			} else {
+				response := PackagesResponseJSON{Packages: packages}
+				err = json.NewEncoder(rw).Encode(&response)
+				if err != nil {
+					log.Printf("GET CLIENT PACKAGES MARSHAL PACKAGES ERROR: %s", err.Error())
+					rw.WriteHeader(http.StatusBadRequest)
+				} else {
+					log.Printf("GET CLIENT PACKAGES SUCCESS")
+					rw.WriteHeader(http.StatusOK)
+				}
 			}
 		}
 	}
