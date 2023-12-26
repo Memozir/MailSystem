@@ -5,8 +5,9 @@ import (
 	"log"
 )
 
-func (db *PostgresDB) CreateAddress(ctx context.Context, name string) error {
-	_, err := db.connPool.Query(ctx, `INSERT INTO address("name") VALUES($1);`, name)
+func (db *PostgresDB) CreateAddress(ctx context.Context, departmentId uint64, addressName string) error {
+	_, err := db.connPool.Query(ctx, `
+	INSERT INTO address("name", department) VALUES($1, $2);`, addressName, departmentId)
 
 	if err != nil {
 		log.Printf("Address was not created: %s", err.Error())
