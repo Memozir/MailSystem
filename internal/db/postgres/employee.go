@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
 	"mail_system/internal/config"
 	"mail_system/internal/model"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func (db *PostgresDB) CreateEmployee(
@@ -73,4 +74,23 @@ func (db *PostgresDB) GetEmployeeDepartmentByRole(ctx context.Context, departmen
 	err := db.connPool.QueryRow(ctx, query, departmentId, role).Scan(&employeeId)
 
 	return employeeId, err
+}
+
+func (db *PostgresDB) CheckAdminAddress(ctx context.Context, adminId uint64, addressName string) (bool, error) {
+	query := `
+		SELECT EXISTS(
+			SELECT a.id
+			FROM address a
+			WHERE a.department = (
+				SELECT d.id
+				FROM employee e
+				INNER JOIN departmnet d ON e.department = d.id
+				WHERE e.id = $1
+			) dep and "name" = $2
+		)
+	`
+	var res bool
+	err := db.connPool.QueryRow(ctx, query, adminId, addressName).Scan(&res)
+
+	return res, err
 }

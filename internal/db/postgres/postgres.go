@@ -3,10 +3,11 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"log"
 	"mail_system/internal/model"
 	"os"
+
+	"github.com/jackc/pgx/v5"
 
 	pgxPool "github.com/jackc/pgx/v5/pgxpool"
 
@@ -65,6 +66,8 @@ type Storage interface {
 	GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error)
 	GetEmployeeDepartments(ctx context.Context, employeeId uint64) ([]model.Department, error)
 	GetClientByLogin(ctx context.Context, login string) (uint64, error)
+	DeleteAddress(ctx context.Context, adminId uint64, addressName string) error
+	CheckAdminAddress(ctx context.Context, adminId uint64, addressName string) (bool, error)
 	//ChangePackageStatus(ctx context.Context, packageID uint64, status int8) error
 }
 

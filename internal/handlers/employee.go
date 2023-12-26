@@ -92,3 +92,55 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 		rw.WriteHeader(http.StatusCreated)
 	}
 }
+
+type DeleteAddressJSON struct {
+	User        UserAuthRequest `json:"user"`
+	AddressName string          `json:"address"`
+}
+
+func (handler *MailHandlers) DeleteAddressByAdmin(rw http.ResponseWriter, r *http.Request) {
+	var deleteInfo DeleteAddressJSON
+	err := json.NewDecoder(r.Body).Decode(&deleteInfo)
+	if err != nil {
+		log.Printf("DELETE ADDRESS ENCODE REQUEST ERROR: %s", err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+	} else {
+		user, err := handler.Db.AuthUser(r.Context(), deleteInfo.User.Login, deleteInfo.User.Pass)
+		if err != nil {
+			log.Printf("DELETE ADDRESS AUTH USER ERROR: %s", err.Error())
+			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			if user.Val.(model.UserAuth).RoleCode >= 3 {
+				employee := handler.Db.GetEmployeeByLogin(r.Context(), deleteInfo.User.Login)
+				if employee.Err != nil {
+					log.Printf("GET ADMIN ERROR: %s", err.Error())
+					rw.WriteHeader(http.StatusBadRequest)
+				} else {
+					check, err := handler.Db.CheckAdminAddress(
+						r.Context(), employee.Val.(model.Employee).EmployeeId, deleteInfo.AddressName)
+					if err != nil {
+						log.Printf("CHECK ADDRESS ERROR: %s", err.Error())
+						rw.WriteHeader(http.StatusBadRequest)
+					} else {
+						if check {
+							err = handler.Db.DeleteAddress(
+								r.Context(), employee.Val.(model.Employee).EmployeeId, deleteInfo.AddressName)
+							if err != nil {
+								log.Printf("DELETE ADDRESS ERROR: %s", err.Error())
+								rw.WriteHeader(http.StatusBadRequest)
+							} else {
+								rw.WriteHeader(http.StatusOK)
+							}
+						} else {
+							log.Println("NO SUCH ADDRESS IN DEPARTMENT")
+							rw.WriteHeader(http.StatusBadRequest)
+						}
+					}
+				}
+			} else {
+				log.Println("NOT ENOUGH RIGHTS")
+				rw.WriteHeader(http.StatusBadRequest)
+			}
+		}
+	}
+}
