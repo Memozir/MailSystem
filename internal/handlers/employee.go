@@ -93,13 +93,14 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 	}
 }
 
-type DeleteAddressJSON struct {
+type ManageAddressJSON struct {
 	User        UserAuthRequest `json:"user"`
 	AddressName string          `json:"address"`
 }
 
 func (handler *MailHandlers) DeleteAddressByAdmin(rw http.ResponseWriter, r *http.Request) {
-	var deleteInfo DeleteAddressJSON
+	var deleteInfo ManageAddressJSON
+
 	err := json.NewDecoder(r.Body).Decode(&deleteInfo)
 	if err != nil {
 		log.Printf("DELETE ADDRESS ENCODE REQUEST ERROR: %s", err.Error())
