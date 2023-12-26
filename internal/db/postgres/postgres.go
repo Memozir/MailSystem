@@ -72,7 +72,7 @@ type Storage interface {
 	CreateAddress(ctx context.Context, departmentId uint64, addressName string) error
 	DeleteAddress(ctx context.Context, addressName string) error
 	CheckAdminAddress(ctx context.Context, adminId uint64, addressName string) (bool, error)
-	//ChangePackageStatus(ctx context.Context, packageID uint64, status int8) error
+	ChangePackageStatus(ctx context.Context, packageID uint64, status uint8) error
 }
 
 type PostgresDB struct {

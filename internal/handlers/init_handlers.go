@@ -51,6 +51,7 @@ func (handler *MailHandlers) LoadHandlers() *mux.Router {
 	router.HandleFunc("/delete/address", handler.DeleteAddressByAdmin).Methods("DELETE")
 	router.HandleFunc("/delete/employee", handler.DeleteAddressByAdmin).Methods("DELETE")
 	router.HandleFunc("/get/courier/packages", handler.GetCourierDeliverPackages).Methods("GET")
+	router.HandleFunc("/package", handler.ChangePackageStatus).Methods("PATCH")
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 

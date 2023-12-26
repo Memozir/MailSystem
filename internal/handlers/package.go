@@ -253,3 +253,48 @@ func (handler *MailHandlers) GetCourierDeliverPackages(rw http.ResponseWriter, r
 		}
 	}
 }
+
+type PackageChangeStatusRequestJSON struct {
+	User      UserAuthRequest `json:"user"`
+	Status    uint8           `json:"status"`
+	PackageId uint64          `json:"package"`
+}
+
+func (handler *MailHandlers) ChangePackageStatus(rw http.ResponseWriter, r *http.Request) {
+	var request PackageChangeStatusRequestJSON
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+		log.Printf("DECODE ERROR: %s", err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+	} else {
+		employee := handler.Db.GetEmployeeByLogin(r.Context(), request.User.Login)
+		if employee.Err != nil {
+			log.Printf("GET EMPLOYEE ERROR: %s", err.Error())
+			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			err = handler.Db.ChangePackageStatus(r.Context(), request.PackageId, request.Status)
+			if err != nil {
+				log.Printf("CHANGE STATUS ERROR: %s", err.Error())
+				rw.WriteHeader(http.StatusBadRequest)
+			} else {
+				employeeRole := uint8(employee.Val.(model.Employee).RoleCode)
+				if employeeRole == config.CourierRole && request.Status == config.PACKAGE_STATUS_DELIVERY {
+					err := handler.Db.AddEmployeeToPackageResponsibleList(
+						r.Context(),
+						employee.Val.(model.Employee).EmployeeId,
+						request.PackageId)
+					if err != nil {
+						log.Printf("ADD COURIER TO RESPONSIBLE LIST ERROR: %s", err.Error())
+						rw.WriteHeader(http.StatusBadRequest)
+						r.Context().Done()
+					} else {
+						log.Printf("COURIER SUCCESSFULLY ADDED TO RESPONSIBLE LIST")
+					}
+				}
+				log.Printf("STATUS OF PACKAGE CHANGED")
+				rw.WriteHeader(http.StatusOK)
+			}
+		}
+	}
+}

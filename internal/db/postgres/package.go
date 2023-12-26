@@ -194,3 +194,15 @@ func (db *PostgresDB) GetCourierDeliverPackages(ctx context.Context, departmentI
 
 	return packages, err
 }
+
+func (db *PostgresDB) ChangePackageStatus(ctx context.Context, packageID uint64, status uint8) error {
+	query := `
+		UPDATE package
+		SET status = $1
+		WHERE id = $2
+	`
+
+	_, err := db.connPool.Exec(ctx, query, status, packageID)
+
+	return err
+}
