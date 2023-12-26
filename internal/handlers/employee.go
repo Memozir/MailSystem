@@ -72,7 +72,7 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 							log.Printf("CREATE EMPLOYEE ERROR: %s", user.Err.Error())
 							rw.WriteHeader(http.StatusBadRequest)
 						} else {
-							log.Println("CREATE EMPLOYEE ERROR")
+							log.Println("CREATE EMPLOYEE SUCCESS")
 							rw.WriteHeader(http.StatusCreated)
 						}
 					}
