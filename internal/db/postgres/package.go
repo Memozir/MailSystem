@@ -3,8 +3,9 @@ package db
 import (
 	"context"
 	"github.com/jackc/pgx/v5"
-	"log"
+	"mail_system/internal/config"
 	"mail_system/internal/model"
+	"strings"
 )
 
 type Tariff struct {
@@ -106,7 +107,11 @@ func (db *PostgresDB) CreatePackage(
 	Address        uint64 `db:"address"
 */
 
-func (db *PostgresDB) GetEmployeePackages(ctx context.Context, employeeId uint64) ([]model.Package, error) {
+func (db *PostgresDB) GetEmployeePackages(
+	ctx context.Context,
+	employeeId uint64,
+	employeeRole uint8,
+	courierDelivery bool) ([]model.Package, error) {
 	query := `
 		SELECT 
 		    DISTINCT p.id,
@@ -137,11 +142,23 @@ func (db *PostgresDB) GetEmployeePackages(ctx context.Context, employeeId uint64
 		INNER JOIN tarrif as t ON pi.tarrif = t.id
 		WHERE ep.employee = $1
 	`
+	var queryBuilder strings.Builder
+	queryBuilder.WriteString(query)
+	var rows pgx.Rows
+	var err error
 
-	rows, err := db.connPool.Query(ctx, query, employeeId)
-
-	if err != nil {
-		log.Printf("ERRRRR %s: ", err.Error())
+	if employeeRole == config.CourierRole {
+		queryBuilder.WriteString(` and p.status = $2`)
+		if courierDelivery {
+			rows, err = db.connPool.Query(ctx,
+				queryBuilder.String(),
+				employeeId,
+				config.PACKAGE_STARUS_DELIVERY_AWAITED)
+		} else {
+			rows, err = db.connPool.Query(ctx, queryBuilder.String(), employeeId, config.PACKAGE_STATUS_DELIVERY)
+		}
+	} else {
+		rows, err = db.connPool.Query(ctx, query, employeeId)
 	}
 
 	packages, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Package])

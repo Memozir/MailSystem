@@ -176,24 +176,44 @@ type EmployeePackagesResponseJSON struct {
 	Packages []model.Package `json:"packages"`
 }
 
+type EmployeePackagesRequestJSON struct {
+	User     UserAuthRequest `json:"user"`
+	Delivery bool            `json:"delivery"`
+}
+
 func (handler *MailHandlers) GetEmployeePackages(rw http.ResponseWriter, r *http.Request) {
 
-	var employeeInfo UserAuthRequest
-	err := json.NewDecoder(r.Body).Decode(&employeeInfo)
+	var employeeInfo EmployeePackagesRequestJSON
+	var err error
+	err = json.NewDecoder(r.Body).Decode(&employeeInfo)
 
 	if err != nil {
 		log.Printf("GET EMPLOYEE PACKAGES ERROR: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	}
 
-	employee := handler.Db.GetEmployeeByLogin(r.Context(), employeeInfo.Login)
+	employee := handler.Db.GetEmployeeByLogin(r.Context(), employeeInfo.User.Login)
 
 	if employee.Err != nil {
 		log.Printf("GET EMPLOYEE ERROR: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
-		//res, err := handler.Db.GetEmployeePackages(r.Context(), 17)
-		res, err := handler.Db.GetEmployeePackages(r.Context(), employee.Val.(model.Employee).EmployeeId)
+		var res []model.Package
+		if uint8(employee.Val.(model.Employee).RoleCode) == config.CourierRole && employeeInfo.Delivery {
+			res, err = handler.Db.GetEmployeePackages(
+				r.Context(),
+				employee.Val.(model.Employee).EmployeeId,
+				uint8(employee.Val.(model.Employee).RoleCode),
+				true,
+			)
+		} else {
+			res, err = handler.Db.GetEmployeePackages(
+				r.Context(),
+				employee.Val.(model.Employee).EmployeeId,
+				uint8(employee.Val.(model.Employee).RoleCode),
+				false,
+			)
+		}
 
 		if err != nil {
 			log.Printf("GET EMPLOYEE PACKAGES ERROR: %s", err.Error())
