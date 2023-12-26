@@ -32,7 +32,6 @@ type Storage interface {
 	CreateEmployee(
 		ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) ResultDB
 	CreateRole(ctx context.Context, code uint8, name string) ResultDB
-	CreateAddress(ctx context.Context, name string) error
 	GetAddressByName(ctx context.Context, addressName string, apartment string) (uint8, error)
 	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
 	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
@@ -66,6 +65,7 @@ type Storage interface {
 	GetClientDepartments(ctx context.Context, clientId uint64) ([]model.Department, error)
 	GetEmployeeDepartments(ctx context.Context, employeeId uint64) ([]model.Department, error)
 	GetClientByLogin(ctx context.Context, login string) (uint64, error)
+	CreateAddress(ctx context.Context, departmentId uint64, addressName string) error
 	DeleteAddress(ctx context.Context, adminId uint64, addressName string) error
 	CheckAdminAddress(ctx context.Context, adminId uint64, addressName string) (bool, error)
 	//ChangePackageStatus(ctx context.Context, packageID uint64, status int8) error
