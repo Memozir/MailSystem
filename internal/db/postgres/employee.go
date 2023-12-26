@@ -26,6 +26,14 @@ func (db *PostgresDB) CreateEmployee(
 	return ResultDB{Err: err, Val: employeeId}
 }
 
+func (db *PostgresDB) DeleteEmployee(ctx context.Context, employeeId uint64) error {
+	query := `
+		DELETE 1 FROM employee WHERE id = $1;
+	`
+	_, err := db.connPool.Exec(ctx, query, employeeId)
+	return err
+}
+
 func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) ResultDB {
 	query := `
 		SELECT e.id, e."user", e."role", e.department
@@ -84,9 +92,9 @@ func (db *PostgresDB) CheckAdminAddress(ctx context.Context, adminId uint64, add
 			WHERE a.department = (
 				SELECT d.id
 				FROM employee e
-				INNER JOIN departmnet d ON e.department = d.id
-				WHERE e.id = $1
-			) dep and "name" = $2
+				INNER JOIN department d ON e.department = d.id
+				WHERE e.id = $1 and a."name" = $2
+			)
 		)
 	`
 	var res bool
