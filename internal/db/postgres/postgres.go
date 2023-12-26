@@ -22,7 +22,6 @@ type ResultDB struct {
 type Storage interface {
 	Reset()
 	CreateUser(ctx context.Context,
-		cancelFunc context.CancelFunc,
 		firstName string,
 		secondName string,
 		middleName string,
@@ -35,7 +34,7 @@ type Storage interface {
 	CreateRole(ctx context.Context, code uint8, name string) ResultDB
 	GetAddressByName(ctx context.Context, addressName string, apartment string) (uint8, error)
 	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
-	GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB
+	GetRoleByName(ctx context.Context, roleName string) ResultDB
 	AuthUser(ctx context.Context, login string, pass string) (ResultDB, error)
 	AddPackageToClient(ctx context.Context, clientId uint64, packageId uint64) error
 	GetDepartmentByReceiver(ctx context.Context, receiverId uint64) (uint64, error)

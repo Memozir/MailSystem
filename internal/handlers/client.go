@@ -33,12 +33,11 @@ func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *ht
 	}
 
 	log.Println(clientJSON)
-	contextUserCreate, cancel := context.WithTimeout(r.Context(), time.Second*2)
-	defer cancel()
+	//	contextUserCreate, cancel := context.WithTimeout(r.Context(), time.Second*2)
+	//	defer cancel()
 
 	userId := handler.Db.CreateUser(
-		contextUserCreate,
-		cancel,
+		r.Context(),
 		clientJSON.FirstName,
 		clientJSON.SecondName,
 		clientJSON.MiddleName,

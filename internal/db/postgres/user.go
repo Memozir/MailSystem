@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
-	"log"
 	"mail_system/internal/model"
 )
 
 func (db *PostgresDB) CreateUser(
 	ctx context.Context,
-	cancelFunc context.CancelFunc,
 	firstName string,
 	secondName string,
 	middleName string,
@@ -24,10 +22,6 @@ func (db *PostgresDB) CreateUser(
 	VALUES($1, $2, $3, $4, $5, $6) RETURNING id;
 	`, login, pass, firstName, secondName, middleName, birth).Scan(&userId)
 
-	if err != nil {
-		log.Printf("Falied create user: %s", err.Error())
-		cancelFunc()
-	}
 	fmt.Println(userId)
 	return ResultDB{userId, err}
 }

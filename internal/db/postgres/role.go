@@ -13,14 +13,9 @@ func (db *PostgresDB) CreateRole(ctx context.Context, code uint8, name string) R
 	return ResultDB{Err: err}
 }
 
-func (db *PostgresDB) GetRoleByName(ctx context.Context, cancelFunc context.CancelFunc, roleName string) ResultDB {
+func (db *PostgresDB) GetRoleByName(ctx context.Context, roleName string) ResultDB {
 	query := `SELECT code FROM "role" WHERE name=$1`
 	var roleCode uint8
 	err := db.connPool.QueryRow(ctx, query, roleName).Scan(&roleCode)
-
-	if err != nil {
-		cancelFunc()
-	}
-
 	return ResultDB{roleCode, err}
 }

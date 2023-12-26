@@ -8,7 +8,6 @@ import (
 	"mail_system/internal/config"
 	"mail_system/internal/model"
 	"net/http"
-	"time"
 )
 
 type UserJSON struct {
@@ -33,12 +32,11 @@ func (handler *MailHandlers) RegisterUserHandler(rw http.ResponseWriter, r *http
 	}
 
 	log.Println(userJSON)
-	contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
-	defer cancelCreateUser()
+	//contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
+	//defer cancelCreateUser()
 
 	userId := handler.Db.CreateUser(
-		contextCreateUser,
-		cancelCreateUser,
+		r.Context(),
 		userJSON.FirstName,
 		userJSON.SecondName,
 		userJSON.MiddleName,
