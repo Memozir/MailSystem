@@ -110,8 +110,7 @@ func (db *PostgresDB) CreatePackage(
 func (db *PostgresDB) GetEmployeePackages(
 	ctx context.Context,
 	employeeId uint64,
-	employeeRole uint8,
-	courierDelivery bool) ([]model.Package, error) {
+	employeeRole uint8) ([]model.Package, error) {
 	query := `
 		SELECT 
 		    DISTINCT p.id,
@@ -149,17 +148,47 @@ func (db *PostgresDB) GetEmployeePackages(
 
 	if employeeRole == config.CourierRole {
 		queryBuilder.WriteString(` and p.status = $2`)
-		if courierDelivery {
-			rows, err = db.connPool.Query(ctx,
-				queryBuilder.String(),
-				employeeId,
-				config.PACKAGE_STARUS_DELIVERY_AWAITED)
-		} else {
-			rows, err = db.connPool.Query(ctx, queryBuilder.String(), employeeId, config.PACKAGE_STATUS_DELIVERY)
-		}
+		rows, err = db.connPool.Query(ctx, queryBuilder.String(), employeeId, config.PACKAGE_STATUS_DELIVERY)
 	} else {
 		rows, err = db.connPool.Query(ctx, query, employeeId)
 	}
+
+	packages, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Package])
+
+	return packages, err
+}
+
+func (db *PostgresDB) GetCourierDeliverPackages(ctx context.Context, departmentId uint64) ([]model.Package, error) {
+	query := `
+		SELECT
+			DISTINCT p.id,
+		    p.status,
+		    p.weight,
+		    u2_rec.login as receiver,
+		    u_send.login as sender,
+		    CAST(p.create_date AS TEXT),
+		 	CAST(p.deliver_date AS TEXT),
+		    p.department_receiver,
+		    CONCAT_WS(' ', addr.name, addr.apartment) sender_address,
+		    COALESCE(
+		    	(
+		    	SELECT id
+		    	FROM employee_package as emp
+		    	INNER JOIN employee as cur_emp ON emp.employee = cur_emp.id
+		    	WHERE cur_emp.role = 1 and emp.package = p.id),
+		    	0) as courier,
+		    p.type
+		FROM storehouse s 
+		INNER JOIN package p ON s.package = p.id
+		INNER JOIN client c on c.id = p.receiver
+		INNER JOIN client c2 on c2.id = p.sender
+		INNER JOIN "user" u_send on u_send.id = c."user"
+		INNER JOIN "user" u2_rec on u2_rec.id = c2."user"
+		INNER JOIN public.address addr on addr.id = c.address
+		WHERE s.department = $1 and p.status = $2
+	`
+
+	rows, err := db.connPool.Query(ctx, query, departmentId, config.PACKAGE_STARUS_DELIVERY_AWAITED)
 
 	packages, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.Package])
 

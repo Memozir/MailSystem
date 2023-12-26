@@ -61,8 +61,8 @@ type Storage interface {
 	GetEmployeePackages(
 		ctx context.Context,
 		employeeId uint64,
-		employeeRole uint8,
-		courierDelivery bool) ([]model.Package, error)
+		employeeRole uint8) ([]model.Package, error)
+	GetCourierDeliverPackages(ctx context.Context, departmentId uint64) ([]model.Package, error)
 	GetEmployeeDepartmentByRole(ctx context.Context, departmentId uint64, role int) (uint64, error)
 	BeginTran(ctx context.Context) (pgx.Tx, error)
 	GetAllDepartments(ctx context.Context) ([]model.Department, error)
