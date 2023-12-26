@@ -27,15 +27,16 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 		log.Printf("Registration employee error: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
-		tx, err := handler.Db.BeginTran(r.Context())
-		defer func() {
-			err := tx.Rollback(r.Context())
-			if err != nil {
-				log.Printf("ROLLBACK TRANSACTION ERROR: %s", err)
-				rw.WriteHeader(http.StatusBadRequest)
-			}
-		}()
-
+		/*
+			tx, err := handler.Db.BeginTran(r.Context())
+			defer func() {
+				err := tx.Rollback(r.Context())
+				if err != nil {
+					log.Printf("ROLLBACK TRANSACTION ERROR: %s", err.Error())
+					rw.WriteHeader(http.StatusBadRequest)
+				}
+			}()
+		*/
 		if err != nil {
 			log.Printf("BEGIN TRANSACTION ERROR: %s", err)
 			rw.WriteHeader(http.StatusBadRequest)
@@ -71,6 +72,7 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 							log.Printf("CREATE EMPLOYEE ERROR: %s", user.Err.Error())
 							rw.WriteHeader(http.StatusBadRequest)
 						} else {
+							log.Println("CREATE EMPLOYEE ERROR")
 							rw.WriteHeader(http.StatusCreated)
 						}
 					}
