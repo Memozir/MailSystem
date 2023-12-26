@@ -131,6 +131,7 @@ func (handler *MailHandlers) DeleteAddressByAdmin(rw http.ResponseWriter, r *htt
 								log.Printf("DELETE ADDRESS ERROR: %s", err.Error())
 								rw.WriteHeader(http.StatusBadRequest)
 							} else {
+								log.Printf("DELETE ADDRESS %s SUCCESS", deleteInfo.AddressName)
 								rw.WriteHeader(http.StatusOK)
 							}
 						} else {

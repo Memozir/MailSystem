@@ -9,8 +9,8 @@ import (
 )
 
 type RoleJSON struct {
-	Code uint8
-	Name string
+	Code uint8  `json:"code"`
+	Name string `json:"name"`
 }
 
 func (handler *MailHandlers) CreateRoleHandler(rw http.ResponseWriter, r *http.Request) {
