@@ -29,11 +29,9 @@ func (db *PostgresDB) GetAddressByName(ctx context.Context, addressName string, 
 	return addressId, nil
 }
 
-func (db *PostgresDB) DeleteAddress(ctx context.Context, adminId uint64, addressName string) error {
+func (db *PostgresDB) DeleteAddress(ctx context.Context, addressName string) error {
 	query := `
-		DELETE 1
-		FROM address
-		WHERE name = $1
+		DELETE FROM address WHERE "name" = $1;
 	`
 
 	_, err := db.connPool.Exec(ctx, query, addressName)

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mail_system/internal/config"
 	db "mail_system/internal/db/postgres"
 	"mail_system/internal/model"
 	"net/http"
@@ -111,7 +112,7 @@ func (handler *MailHandlers) DeleteAddressByAdmin(rw http.ResponseWriter, r *htt
 			log.Printf("DELETE ADDRESS AUTH USER ERROR: %s", err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
-			if user.Val.(model.UserAuth).RoleCode >= 3 {
+			if user.Val.(model.UserAuth).RoleCode >= int8(config.AdminRole) {
 				employee := handler.Db.GetEmployeeByLogin(r.Context(), deleteInfo.User.Login)
 				if employee.Err != nil {
 					log.Printf("GET ADMIN ERROR: %s", err.Error())
@@ -125,7 +126,7 @@ func (handler *MailHandlers) DeleteAddressByAdmin(rw http.ResponseWriter, r *htt
 					} else {
 						if check {
 							err = handler.Db.DeleteAddress(
-								r.Context(), employee.Val.(model.Employee).EmployeeId, deleteInfo.AddressName)
+								r.Context(), deleteInfo.AddressName)
 							if err != nil {
 								log.Printf("DELETE ADDRESS ERROR: %s", err.Error())
 								rw.WriteHeader(http.StatusBadRequest)

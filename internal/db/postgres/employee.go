@@ -28,7 +28,7 @@ func (db *PostgresDB) CreateEmployee(
 
 func (db *PostgresDB) DeleteEmployee(ctx context.Context, employeeId uint64) error {
 	query := `
-		DELETE 1 FROM employee WHERE id = $1;
+		DELETE FROM employee WHERE id = $1;
 	`
 	_, err := db.connPool.Exec(ctx, query, employeeId)
 	return err
