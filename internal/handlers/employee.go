@@ -53,8 +53,8 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 				log.Printf("CREATE USER ERROR: %s", user.Err.Error())
 				rw.WriteHeader(http.StatusBadRequest)
 			} else {
-				role := handler.Db.GetRoleByName(r.Context(), emp.Role.Name)
-				if role.Err != nil {
+				role, err := handler.Db.GetRoleByName(r.Context(), emp.Role.Name)
+				if err != nil {
 					log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
 					rw.WriteHeader(http.StatusBadRequest)
 				} else {
@@ -63,12 +63,12 @@ func (handler *MailHandlers) RegisterEmployeeHandler(rw http.ResponseWriter, r *
 						log.Printf("GET USER ROLE ERROR: %s", user.Err.Error())
 						rw.WriteHeader(http.StatusBadRequest)
 					} else {
-						employeeCreateResult := handler.Db.CreateEmployee(
+						_, err := handler.Db.CreateEmployee(
 							r.Context(),
 							user.Val.(uint8),
 							creatorEmployee.Val.(model.Employee).DepartmentId,
 							role.Val.(uint8))
-						if employeeCreateResult.Err != nil {
+						if err != nil {
 							log.Printf("CREATE EMPLOYEE ERROR: %s", user.Err.Error())
 							rw.WriteHeader(http.StatusBadRequest)
 						} else {

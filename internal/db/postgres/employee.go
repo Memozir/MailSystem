@@ -9,7 +9,7 @@ import (
 )
 
 func (db *PostgresDB) CreateEmployee(
-	ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) ResultDB {
+	ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) (ResultDB, error) {
 	query := `
 			INSERT INTO employee("user", "role", department) VALUES($1, $2, $3) RETURNING id;
 		`
@@ -23,7 +23,7 @@ func (db *PostgresDB) CreateEmployee(
 		_, err = db.connPool.Exec(ctx, query, employeeId)
 	}
 
-	return ResultDB{Err: err, Val: employeeId}
+	return ResultDB{Err: err, Val: employeeId}, err
 }
 
 func (db *PostgresDB) DeleteEmployee(ctx context.Context, employeeId uint64) error {

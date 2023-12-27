@@ -25,9 +25,9 @@ func (handler *MailHandlers) CreateRoleHandler(rw http.ResponseWriter, r *http.R
 
 	contextCreateRole, cancel := context.WithTimeout(r.Context(), time.Second*2)
 	defer cancel()
-	res := handler.Db.CreateRole(contextCreateRole, role.Code, role.Name)
+	res, err := handler.Db.CreateRole(contextCreateRole, role.Code, role.Name)
 
-	if res.Err != nil {
+	if err != nil {
 		log.Printf("Role was not created: %s", res.Err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 		return
