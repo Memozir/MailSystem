@@ -150,7 +150,7 @@ func (handler *MailHandlers) DeleteEmployee(rw http.ResponseWriter, r *http.Requ
 						log.Printf("DELETE EMPLOYEE ERROR: %s", err)
 						rw.WriteHeader(http.StatusBadRequest)
 					} else {
-						log.Printf("DELETE EMPLOYEE SUCCESS: %s", err)
+						log.Printf("DELETE EMPLOYEE SUCCESS")
 						rw.WriteHeader(http.StatusOK)
 					}
 				}
