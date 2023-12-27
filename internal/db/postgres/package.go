@@ -121,7 +121,7 @@ func (db *PostgresDB) GetEmployeePackages(
 		    CAST(p.create_date AS TEXT),
 		 	CAST(p.deliver_date AS TEXT),
 		    p.department_receiver,
-		    CONCAT_WS(' ', addr.name, addr.apartment) sender_address,
+		    CONCAT_WS(' ', addr.name, send.apartment) sender_address,
 		    COALESCE(
 		    	(
 		    	SELECT id
@@ -169,7 +169,7 @@ func (db *PostgresDB) GetCourierDeliverPackages(ctx context.Context, departmentI
 		    CAST(p.create_date AS TEXT),
 		 	CAST(p.deliver_date AS TEXT),
 		    p.department_receiver,
-		    CONCAT_WS(' ', addr.name, addr.apartment) sender_address,
+		    CONCAT_WS(' ', addr.name, c2.apartment) sender_address,
 		    COALESCE(
 		    	(
 		    	SELECT id
@@ -218,7 +218,7 @@ func (db *PostgresDB) GetClientPackages(ctx context.Context, clientId uint64) ([
 		    CAST(p.create_date AS TEXT),
 		 	CAST(p.deliver_date AS TEXT),
 		    p.department_receiver,
-		    CONCAT_WS(' ', addr.name, addr.apartment) sender_address,
+		    CONCAT_WS(' ', addr.name, c2.apartment) sender_address,
 		    COALESCE(
 		    	(
 		    	SELECT id
