@@ -14,7 +14,7 @@ func (db *PostgresDB) CreateUser(
 	middleName string,
 	login string,
 	pass string,
-	birth string) ResultDB {
+	birth string) (ResultDB, error) {
 
 	var userId uint8
 	err := db.connPool.QueryRow(ctx, `
@@ -23,7 +23,7 @@ func (db *PostgresDB) CreateUser(
 	`, login, pass, firstName, secondName, middleName, birth).Scan(&userId)
 
 	fmt.Println(userId)
-	return ResultDB{userId, err}
+	return ResultDB{userId, err}, err
 }
 
 func (db *PostgresDB) GetUserIdByLogin(ctx context.Context, login string) (ResultDB, error) {

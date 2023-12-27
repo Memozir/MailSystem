@@ -27,7 +27,7 @@ type Storage interface {
 		middleName string,
 		login string,
 		pass string,
-		birth string) ResultDB
+		birth string) (ResultDB, error)
 	CreateEmployee(
 		ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) (ResultDB, error)
 	DeleteEmployee(ctx context.Context, employeeId uint64) error

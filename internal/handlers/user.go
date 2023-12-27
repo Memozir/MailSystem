@@ -35,7 +35,7 @@ func (handler *MailHandlers) RegisterUserHandler(rw http.ResponseWriter, r *http
 	//contextCreateUser, cancelCreateUser := context.WithTimeout(r.Context(), time.Second*2)
 	//defer cancelCreateUser()
 
-	userId := handler.Db.CreateUser(
+	userId, err := handler.Db.CreateUser(
 		r.Context(),
 		userJSON.FirstName,
 		userJSON.SecondName,
