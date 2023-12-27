@@ -19,6 +19,7 @@ type UserJSON struct {
 	SecondName string `json:"second_name"`
 	MiddleName string `json:"middle_name"`
 	BirthDate  string `json:"birth_date"`
+	Apartment  string `json:"appartment"`
 }
 
 func (handler *MailHandlers) RegisterUserHandler(rw http.ResponseWriter, r *http.Request) {

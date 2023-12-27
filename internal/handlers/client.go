@@ -21,7 +21,8 @@ type ClientJSON struct {
 }
 
 type ClientCreateResponse struct {
-	ClientId string `json:"id"`
+	ClientId  string `json:"id"`
+	Apartment string `json:"apartment"`
 }
 
 func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *http.Request) {

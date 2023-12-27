@@ -29,10 +29,10 @@ type Storage interface {
 		pass string,
 		birth string) (ResultDB, error)
 	CreateEmployee(
-		ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) (ResultDB, error)
+		ctx context.Context, userId uint64, departmentId uint64, roleCode uint8) (ResultDB, error)
 	DeleteEmployee(ctx context.Context, employeeId uint64) error
 	CreateRole(ctx context.Context, code uint8, name string) (ResultDB, error)
-	GetAddressByName(ctx context.Context, addressName string, apartment string) (uint8, error)
+	GetAddressByName(ctx context.Context, addressName string) (uint8, error)
 	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
 	GetRoleByName(ctx context.Context, roleName string) (ResultDB, error)
 	AuthUser(ctx context.Context, login string, pass string) (ResultDB, error)

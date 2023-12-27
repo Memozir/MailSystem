@@ -9,7 +9,7 @@ import (
 )
 
 func (db *PostgresDB) CreateEmployee(
-	ctx context.Context, userId uint8, departmentId uint64, roleCode uint8) (ResultDB, error) {
+	ctx context.Context, userId uint64, departmentId uint64, roleCode uint8) (ResultDB, error) {
 	query := `
 			INSERT INTO employee("user", "role", department) VALUES($1, $2, $3) RETURNING id;
 		`

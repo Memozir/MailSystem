@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS "user"(
     id bigserial primary key,
     phone varchar(12) unique,
     pass varchar(20) not null,
+    "login" varchar(30) not null UNIQUE,
     birth_date date,
     first_name varchar(30),
     last_name varchar(30)

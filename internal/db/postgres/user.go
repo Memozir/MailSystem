@@ -2,13 +2,11 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"github.com/jackc/pgx/v5"
 	"mail_system/internal/model"
 )
 
-func (db *PostgresDB) CreateUser(
-	ctx context.Context,
+func (db *PostgresDB) CreateUser(ctx context.Context,
 	firstName string,
 	secondName string,
 	middleName string,
@@ -16,13 +14,12 @@ func (db *PostgresDB) CreateUser(
 	pass string,
 	birth string) (ResultDB, error) {
 
-	var userId uint8
+	var userId uint64
 	err := db.connPool.QueryRow(ctx, `
 	INSERT INTO "user"(login, pass, first_name, last_name, middle_name, birth_date)
 	VALUES($1, $2, $3, $4, $5, $6) RETURNING id;
 	`, login, pass, firstName, secondName, middleName, birth).Scan(&userId)
 
-	fmt.Println(userId)
 	return ResultDB{userId, err}, err
 }
 

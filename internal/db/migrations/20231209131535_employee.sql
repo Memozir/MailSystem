@@ -3,10 +3,9 @@
 CREATE TABLE IF NOT EXISTS employee(
     id bigserial primary key,
     "user" bigint unique,
-    "role" bigint unique,
-    foreign key ("user") references "user",
-    foreign key ("role") references "role",
-    unique("user", "role")
+    "role" bigint,
+    foreign key ("user") references "user" ON DELETE CASCADE,
+    foreign key ("role") references "role"
 );
 -- +goose StatementEnd
 

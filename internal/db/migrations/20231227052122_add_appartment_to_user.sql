@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-ALTER TABLE "user" ADD COLUMN "login" varchar(30) NOT NULL UNIQUE;
+ALTER TABLE "client" ADD COLUMN apartment varchar(30) not null default '';
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-ALTER TABLE "user" DROP COLUMN "login";
+ALTER TABLE "client" DROP COLUMN apartment;
 -- +goose StatementEnd
