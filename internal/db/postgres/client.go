@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-func (db *PostgresDB) CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error {
+func (db *PostgresDB) CreateClient(ctx context.Context, userId uint64, addressName string, apartment string) error {
 	addressId, err := db.GetAddressByName(ctx, addressName)
 	query := `INSERT INTO client("user", address, apartment) VALUES($1, $2, $3)`
 

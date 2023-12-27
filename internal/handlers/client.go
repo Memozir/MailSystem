@@ -49,7 +49,7 @@ func (handler *MailHandlers) RegisterClientHandler(rw http.ResponseWriter, r *ht
 	contextCreateClient, cancelCreateClient := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancelCreateClient()
 
-	err = handler.Db.CreateClient(contextCreateClient, userId.Val.(uint8), clientJSON.Address, clientJSON.Apartment)
+	err = handler.Db.CreateClient(contextCreateClient, userId.Val.(uint64), clientJSON.Address, clientJSON.Apartment)
 
 	if err != nil {
 		log.Printf("client was not created: %s", err.Error())

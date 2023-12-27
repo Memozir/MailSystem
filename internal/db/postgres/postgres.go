@@ -33,7 +33,7 @@ type Storage interface {
 	DeleteEmployee(ctx context.Context, employeeId uint64) error
 	CreateRole(ctx context.Context, code uint8, name string) (ResultDB, error)
 	GetAddressByName(ctx context.Context, addressName string) (uint8, error)
-	CreateClient(ctx context.Context, userId uint8, addressName string, apartment string) error
+	CreateClient(ctx context.Context, userId uint64, addressName string, apartment string) error
 	GetRoleByName(ctx context.Context, roleName string) (ResultDB, error)
 	AuthUser(ctx context.Context, login string, pass string) (ResultDB, error)
 	AddPackageToClient(ctx context.Context, clientId uint64, packageId uint64) error
