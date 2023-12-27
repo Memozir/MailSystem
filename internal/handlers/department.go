@@ -86,3 +86,32 @@ func (handler *MailHandlers) GetEmployeeDepartments(rw http.ResponseWriter, r *h
 		}
 	}
 }
+
+type GetDepartmentEmployeesResponse struct {
+	Employees []model.EmployeeInfo `json:"employees"`
+}
+
+func (handler *MailHandlers) GetDepartmentEmployees(rw http.ResponseWriter, r *http.Request) {
+	var request UserAuthRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		log.Printf("DEOCODE ERROR: %s", err)
+		rw.WriteHeader(http.StatusBadRequest)
+	} else {
+		department := handler.Db.GetEmployeeDepartment(r.Context(), request.Login)
+		if department.Err != nil {
+			log.Printf("GET DEPARTMENT ERROR: %s", err)
+			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			employees, err := handler.Db.GetDepartmentEmployees(r.Context(), department.Val.(uint64))
+			if err != nil {
+				log.Printf("GET EMPLOYEES ERROR: %s", err)
+				rw.WriteHeader(http.StatusBadRequest)
+			} else {
+				response := GetDepartmentEmployeesResponse{Employees: employees}
+				err = json.NewEncoder(rw).Encode(&response)
+				rw.WriteHeader(http.StatusOK)
+			}
+		}
+	}
+}

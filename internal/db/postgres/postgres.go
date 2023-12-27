@@ -74,6 +74,7 @@ type Storage interface {
 	CheckAdminAddress(ctx context.Context, adminId uint64, addressName string) (bool, error)
 	ChangePackageStatus(ctx context.Context, packageID uint64, status uint8) error
 	GetClientPackages(ctx context.Context, clientId uint64) ([]model.Package, error)
+	GetDepartmentEmployees(ctx context.Context, departmentId uint64) ([]model.EmployeeInfo, error)
 }
 
 type PostgresDB struct {

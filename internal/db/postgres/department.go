@@ -88,3 +88,32 @@ func (db *PostgresDB) GetEmployeeDepartments(ctx context.Context, employeeId uin
 
 	return departments, err
 }
+
+func (db *PostgresDB) GetDepartmentEmployees(ctx context.Context, departmentId uint64) ([]model.EmployeeInfo, error) {
+	query := `
+		SELECT
+		    e.id,
+		    r.name role_name,
+		    u.first_name,
+		    u.last_name,
+		    u.middle_name,
+		    u.login,
+		    u.pass
+		FROM employee e
+		INNER JOIN public."user" u on u.id = e."user"
+		INNER JOIN public.role r on r.code = e.role
+		WHERE e.department = $1
+	`
+	rows, err := db.connPool.Query(ctx, query, departmentId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	employees, err := pgx.CollectRows(rows, pgx.RowToStructByName[model.EmployeeInfo])
+	if err != nil {
+		return nil, err
+	}
+
+	return employees, err
+}

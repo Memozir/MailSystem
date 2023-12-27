@@ -5,12 +5,13 @@ import (
 )
 
 type User struct {
-	Id        uint64 `db:"id"`
-	Phone     string `db:"phone"`
-	Pass      string `db:"pass"`
-	FirstName string `db:"first_name"`
-	LastName  string `db:"last_name"`
-	BirthDate string `db:"birth_date"`
+	Id         uint64 `db:"id"`
+	Phone      string `db:"phone"`
+	Pass       string `db:"pass"`
+	FirstName  string `db:"first_name"`
+	LastName   string `db:"last_name"`
+	MiddleName string `db:"middle_name"`
+	BirthDate  string `db:"birth_date"`
 }
 
 func (user *User) String() string {
@@ -34,6 +35,28 @@ type Employee struct {
 	UserId       uint64 `db:"user"`
 	RoleCode     int8   `db:"role"`
 	DepartmentId uint64 `db:"department"`
+}
+
+type EmployeeInfo struct {
+	EmployeeId uint64 `db:"id" json:"employee_id"`
+	RoleName   string `db:"role_name" json:"role_name"`
+	Login      string `db:"login" json:"login"`
+	Pass       string `db:"pass" json:"pass"`
+	FirstName  string `db:"first_name" json:"first_name"`
+	LastName   string `db:"last_name" json:"last_name"`
+	MiddleName string `db:"middle_name" json:"middle_name"`
+}
+
+func (e *EmployeeInfo) String() string {
+	return fmt.Sprintf(
+		"id=%d role=%s pass=%s firstName=%s lastName=%s middleName=%s",
+		e.EmployeeId,
+		e.RoleName,
+		e.Pass,
+		e.FirstName,
+		e.LastName,
+		e.MiddleName,
+	)
 }
 
 /*
