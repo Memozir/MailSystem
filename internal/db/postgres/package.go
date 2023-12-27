@@ -230,8 +230,8 @@ func (db *PostgresDB) GetClientPackages(ctx context.Context, clientId uint64) ([
 		FROM package p
 			INNER JOIN client c on c.id = p.receiver
 			INNER JOIN client c2 on c2.id = p.sender
-			INNER JOIN "user" u_send on u_send.id = c."user"
-			INNER JOIN "user" u2_rec on u2_rec.id = c2."user"
+			INNER JOIN "user" u_send on u_send.id = c2."user"
+			INNER JOIN "user" u2_rec on u2_rec.id = c."user"
 			INNER JOIN public.address addr on addr.id = c.address
 		WHERE p.sender = $1 and p.status < $2
 	`
