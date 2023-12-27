@@ -65,9 +65,9 @@ func (handler *MailHandlers) GetEmployeeDepartments(rw http.ResponseWriter, r *h
 		log.Printf("GET CLIENT DEPARTMENTS ERROR: %s", err)
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
-		employee := handler.Db.GetEmployeeByLogin(r.Context(), user.Login)
+		employee, err := handler.Db.GetEmployeeByLogin(r.Context(), user.Login)
 
-		if employee.Err != nil {
+		if err != nil {
 			log.Printf("GET EMPLOYEE ID ERROR: %s", err)
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
@@ -95,7 +95,7 @@ func (handler *MailHandlers) GetDepartmentEmployees(rw http.ResponseWriter, r *h
 	var request UserAuthRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		log.Printf("DEOCODE ERROR: %s", err)
+		log.Printf("DECODE ERROR: %s", err)
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
 		department := handler.Db.GetEmployeeDepartment(r.Context(), request.Login)

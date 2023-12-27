@@ -38,7 +38,7 @@ type Storage interface {
 	AuthUser(ctx context.Context, login string, pass string) (ResultDB, error)
 	AddPackageToClient(ctx context.Context, clientId uint64, packageId uint64) error
 	GetDepartmentByReceiver(ctx context.Context, receiverId uint64) (uint64, error)
-	GetEmployeeByLogin(ctx context.Context, login string) ResultDB
+	GetEmployeeByLogin(ctx context.Context, login string) (ResultDB, error)
 	GetEmployeeDepartment(ctx context.Context, login string) ResultDB
 	ProducePaymentInfo(ctx context.Context, packageId uint64, packageType int, weight int) error
 	AddEmployeeToPackageResponsibleList(ctx context.Context, employeeId uint64, packageId uint64) error

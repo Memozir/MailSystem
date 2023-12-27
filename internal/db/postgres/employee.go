@@ -34,7 +34,7 @@ func (db *PostgresDB) DeleteEmployee(ctx context.Context, employeeId uint64) err
 	return err
 }
 
-func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) ResultDB {
+func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) (ResultDB, error) {
 	query := `
 		SELECT e.id, e."user", e."role", e.department
 		FROM employee e
@@ -46,14 +46,14 @@ func (db *PostgresDB) GetEmployeeByLogin(ctx context.Context, login string) Resu
 	var employee model.Employee
 	row, err := db.connPool.Query(ctx, query, login)
 	if err != nil {
-		return ResultDB{Val: employee, Err: err}
+		return ResultDB{Val: employee, Err: err}, err
 	}
 	employee, err = pgx.CollectOneRow(row, pgx.RowToStructByName[model.Employee])
 	if err != nil {
-		return ResultDB{Val: employee, Err: err}
+		return ResultDB{Val: employee, Err: err}, err
 	}
 
-	return ResultDB{Val: employee, Err: err}
+	return ResultDB{Val: employee, Err: err}, err
 }
 
 func (db *PostgresDB) GetEmployeeDepartment(ctx context.Context, login string) ResultDB {
@@ -66,7 +66,6 @@ func (db *PostgresDB) GetEmployeeDepartment(ctx context.Context, login string) R
 
 	var departmentId uint64
 	err := db.connPool.QueryRow(ctx, query, login).Scan(&departmentId)
-
 	return ResultDB{Val: departmentId, Err: err}
 }
 

@@ -18,20 +18,25 @@ func (handler *MailHandlers) CreateAddressHandler(rw http.ResponseWriter, r *htt
 		log.Printf("ADDRES DECODE ERROR: %s", err)
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
-		employee := handler.Db.GetEmployeeByLogin(r.Context(), request.User.Login)
-		if employee.Val.(model.Employee).RoleCode >= int8(config.AdminRole) {
-			err = handler.Db.CreateAddress(r.Context(),
-				employee.Val.(model.Employee).DepartmentId, request.AddressName)
-			if err != nil {
-				log.Printf("ADDRES CREATION ERROR: %s", err)
-				rw.WriteHeader(http.StatusBadRequest)
-			} else {
-				log.Printf("ADDRESS <%s> WAS CREATED", request.AddressName)
-				rw.WriteHeader(http.StatusOK)
-			}
-		} else {
-			log.Println("NOT ENOUGH RIGHTS")
+		employee, err := handler.Db.GetEmployeeByLogin(r.Context(), request.User.Login)
+		if err != nil {
+			log.Printf("GET EMPLOY BY LOGIN ERROR: %s", err)
 			rw.WriteHeader(http.StatusBadRequest)
+		} else {
+			if employee.Val.(model.Employee).RoleCode >= int8(config.AdminRole) {
+				err = handler.Db.CreateAddress(r.Context(),
+					employee.Val.(model.Employee).DepartmentId, request.AddressName)
+				if err != nil {
+					log.Printf("ADDRES CREATION ERROR: %s", err)
+					rw.WriteHeader(http.StatusBadRequest)
+				} else {
+					log.Printf("ADDRESS <%s> WAS CREATED", request.AddressName)
+					rw.WriteHeader(http.StatusOK)
+				}
+			} else {
+				log.Println("NOT ENOUGH RIGHTS")
+				rw.WriteHeader(http.StatusBadRequest)
+			}
 		}
 	}
 

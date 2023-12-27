@@ -93,12 +93,12 @@ func (handler *MailHandlers) CreateDepartmentPackageHandler(rw http.ResponseWrit
 								log.Printf("ADD PACKAGE TO CLIENT ERROR: %s", err.Error())
 								rw.WriteHeader(http.StatusBadRequest)
 							} else {
-								worker := handler.Db.GetEmployeeByLogin(
+								worker, err := handler.Db.GetEmployeeByLogin(
 									r.Context(),
 									packageCreate.WorkerLogin,
 								)
 
-								if worker.Err != nil {
+								if err != nil {
 									log.Printf("GET EMPLOYEE BY LOGIN (CREATE PACKAGE) ERROR: %s", err.Error())
 									rw.WriteHeader(http.StatusBadRequest)
 								} else {
@@ -186,9 +186,9 @@ func (handler *MailHandlers) GetEmployeePackages(rw http.ResponseWriter, r *http
 		rw.WriteHeader(http.StatusBadRequest)
 	}
 
-	employee := handler.Db.GetEmployeeByLogin(r.Context(), employeeInfo.Login)
+	employee, err := handler.Db.GetEmployeeByLogin(r.Context(), employeeInfo.Login)
 
-	if employee.Err != nil {
+	if err != nil {
 		log.Printf("GET EMPLOYEE ERROR: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
@@ -225,9 +225,9 @@ func (handler *MailHandlers) GetCourierDeliverPackages(rw http.ResponseWriter, r
 		rw.WriteHeader(http.StatusBadRequest)
 	}
 
-	employee := handler.Db.GetEmployeeByLogin(r.Context(), courierInfo.Login)
+	employee, err := handler.Db.GetEmployeeByLogin(r.Context(), courierInfo.Login)
 
-	if employee.Err != nil {
+	if err != nil {
 		log.Printf("GET COURIER EMPLOYEE ERROR: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
@@ -268,8 +268,8 @@ func (handler *MailHandlers) ChangePackageStatus(rw http.ResponseWriter, r *http
 		log.Printf("DECODE ERROR: %s", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
 	} else {
-		employee := handler.Db.GetEmployeeByLogin(r.Context(), request.User.Login)
-		if employee.Err != nil {
+		employee, err := handler.Db.GetEmployeeByLogin(r.Context(), request.User.Login)
+		if err != nil {
 			log.Printf("GET EMPLOYEE ERROR: %s", err.Error())
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
