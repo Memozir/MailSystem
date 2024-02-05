@@ -10,3 +10,5 @@ CREATE TABLE IF NOT EXISTS "role"(
 -- +goose StatementBegin
 DROP TABLE IF EXISTS "role";
 -- +goose StatementEnd
+
+DROP table role
