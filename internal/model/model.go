@@ -78,7 +78,7 @@ type Package struct {
 	Weight         int    `db:"weight" json:"weight"`
 	Sender         string `db:"sender" json:"sender"`
 	Receiver       string `db:"receiver" json:"receiver"`
-	Courier        uint64 `db:"courier" json:"courier"`
+	Courier        string `db:"courier" json:"courier"`
 	DateOfCreation string `db:"create_date" json:"date_of_creation"`
 	DateOfReceipt  string `db:"deliver_date" json:"date_of_receipt"`
 	NumDepartment  uint64 `db:"department_receiver" json:"num_department"`

@@ -2,10 +2,11 @@ package db
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
 	"mail_system/internal/config"
 	"mail_system/internal/model"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type Tariff struct {
@@ -124,11 +125,12 @@ func (db *PostgresDB) GetEmployeePackages(
 		    CONCAT_WS(' ', addr.name, send.apartment) sender_address,
 		    COALESCE(
 		    	(
-		    	SELECT id
+		    	SELECT u_cur.login
 		    	FROM employee_package as emp
 		    	INNER JOIN employee as cur_emp ON emp.employee = cur_emp.id
+				INNER JOIN "user" u_cur ON cur_emp."user" = u_cur.id
 		    	WHERE cur_emp.role = 1 and emp.package = p.id),
-		    	0) as courier,
+		    	'') as courier,
 		    t.type
 		FROM employee_package as ep
 			INNER JOIN package as p ON ep.package = p.id
