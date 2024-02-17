@@ -59,19 +59,6 @@ func (e *EmployeeInfo) String() string {
 	)
 }
 
-/*
-	'id': 2,
-	'status': 3,
-	'weight': 2100,
-	'sender': '8921312',
-	'receiver': '895975',
-	'courier': 'qwe323rty',
-	'date_of_creation': '2002-11-01',
-	'date_of_receipt': '2002-11-04',
-	'num_department': 3,
-	'address': 'Baturina1'
-*/
-
 type Package struct {
 	Id             uint64 `db:"id" json:"id"`
 	Status         int    `db:"status" json:"status"`
