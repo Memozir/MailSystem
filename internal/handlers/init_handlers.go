@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
-
+	"log"
 	db "mail_system/internal/db/postgres"
+	middlewares "mail_system/internal/middlewares/auth"
+	"net/http"
 
 	"github.com/gorilla/mux"
 
@@ -54,6 +56,12 @@ func (handler *MailHandlers) LoadHandlers() *mux.Router {
 	router.HandleFunc("/get/courier/packages", handler.GetCourierDeliverPackages).Methods("GET")
 	router.HandleFunc("/package", handler.ChangePackageStatus).Methods("PATCH")
 	router.HandleFunc("/department/employees", handler.GetDepartmentEmployees).Methods("GET")
+
+	router.HandleFunc("/test", func(writer http.ResponseWriter, request *http.Request) {
+		log.Println("Test")
+	}).Methods("POST")
+
+	router.Use(middlewares.AuthenticationMiddleware)
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 

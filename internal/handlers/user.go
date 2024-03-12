@@ -7,6 +7,7 @@ import (
 	"log"
 	"mail_system/internal/config"
 	"mail_system/internal/model"
+	utils "mail_system/internal/utils/auth"
 	"net/http"
 )
 
@@ -70,7 +71,8 @@ type UserAuthRequest struct {
 }
 
 type UserAuthResponse struct {
-	Role int8 `json:"role"`
+	Role        int8   `json:"role"`
+	AccessToken string `json:"token"`
 }
 
 // AuthUserHandler AuthUser godoc
@@ -102,7 +104,14 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 	} else if res.Val.(model.UserAuth).ClientId > 0 {
 		log.Println("SUCCESS CLIENT AUTH")
 
-		response := UserAuthResponse{Role: config.UserRole}
+		accessToken, err := utils.GetAccessToken("client")
+
+		if err != nil {
+			http.Error(rw, "Token error", http.StatusBadGateway)
+			return
+		}
+
+		response := UserAuthResponse{Role: config.UserRole, AccessToken: accessToken}
 		err = json.NewEncoder(rw).Encode(&response)
 
 		if err != nil {
@@ -114,7 +123,14 @@ func (handler *MailHandlers) AuthUserHandler(rw http.ResponseWriter, r *http.Req
 	} else if res.Val.(model.UserAuth).RoleCode != 0 {
 		log.Println("SUCCESS EMPLOYEE AUTH")
 
-		response := UserAuthResponse{Role: res.Val.(model.UserAuth).RoleCode}
+		accessToken, err := utils.GetAccessToken("employee")
+
+		if err != nil {
+			http.Error(rw, "Token error", http.StatusBadGateway)
+			return
+		}
+
+		response := UserAuthResponse{Role: res.Val.(model.UserAuth).RoleCode, AccessToken: accessToken}
 		err = json.NewEncoder(rw).Encode(response)
 
 		if err != nil {
